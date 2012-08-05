@@ -1,0 +1,4 @@
+OhHa
+====
+
+Ohjelmoinnin harjoitustyö: kortisto
