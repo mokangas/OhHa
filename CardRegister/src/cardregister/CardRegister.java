@@ -5,6 +5,7 @@
 package cardregister;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,23 +22,20 @@ public class CardRegister {
         
         Register register = new Register();
         
-//        long aika =  System.currentTimeMillis();
+        register.load("10000_Cards.txt");
         
-        boolean a = register.load("10_Cards.txt");
-        register.addCard(new Card(Card.labels));
-        try {
-            register.save("10_Cards.txt");
-    //        aika = System.currentTimeMillis() -aika;
-    //        System.out.println(aika);
-    //        
-    //        aika =  System.currentTimeMillis();
-    //        register.search("jfh");
-    //        aika = System.currentTimeMillis() - aika;
-    //register.printAll();
-            //register.printAll();
-        } catch (IOException ex) {
-            Logger.getLogger(CardRegister.class.getName()).log(Level.SEVERE, null, ex);
+       
+        String[] haku = new String[Card.NUMBER_OF_FIELDS];
+        for (int i = 0; i < haku.length; i++) {
+            haku[i] = "";
         }
+        haku[Card.NUMBER_OF_FIELDS-1] = "           F       ";
         
+        
+        long aika = System.currentTimeMillis();
+        List<Card> search = register.search(haku);
+        aika = System.currentTimeMillis() - aika;
+        System.out.println(aika+" ms.");
+        System.out.println(search.size()+" tulosta.");
     }
 }

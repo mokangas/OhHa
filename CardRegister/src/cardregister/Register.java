@@ -8,6 +8,7 @@ import CardStorage.TextFileLoader;
 import CardStorage.TextFileSaver;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -61,14 +62,14 @@ public class Register {
      * Testaukseen ja kokeiluun.
      */
     
-    public void search(String search){
-        int  i=1;
+    public List<Card> search(String[] search){
+        
+        List<Card> returnList = new ArrayList<>();
         for (Card card : cards){
-            if (card.search(search)) {
-                card.print();
-                System.out.println("\n"+i+"\n");
-                i++;
+            if (card.compareFields(search)) {
+                returnList.add(card);
             }
         }
+        return returnList;
     }
 }

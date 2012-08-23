@@ -27,10 +27,10 @@ public class Card {
         this.content = textFields;
     }
 
-    public String[] getContent(){
+    public String[] getContent() {
         return content;
     }
-    
+
     /**
      * TESTAUSTA JA KOKEILUA VARTEN
      */
@@ -51,5 +51,16 @@ public class Card {
             }
         }
         return false;
+    }
+
+    public boolean compareFields(String[] comparedTo) {
+        for (int i = 0; i < NUMBER_OF_FIELDS; i++) {
+            String fieldLowerCase = content[i].toLowerCase();
+            String comparator = comparedTo[i].toLowerCase().trim();
+            if (!fieldLowerCase.contains(comparator)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
