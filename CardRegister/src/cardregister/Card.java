@@ -30,7 +30,19 @@ public class Card {
     public String[] getContent() {
         return content;
     }
+    
+    public void setContent(String[] newContent){
+        content = newContent;
+    }
+    
+    public void changeField(int fieldNumber, String newText){
+        content[fieldNumber]= newText;
+    }
 
+    public static String[] getLabels(){
+        return labels;
+    }
+    
     /**
      * TESTAUSTA JA KOKEILUA VARTEN
      */
@@ -39,6 +51,8 @@ public class Card {
             System.out.println(content[i]);
         }
     }
+    
+   
 
     /**
      * Testaukseen ja kokeiluun.

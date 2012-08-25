@@ -9,6 +9,7 @@ import CardStorage.TextFileSaver;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -18,54 +19,79 @@ import java.util.List;
 public class Register {
 
     private List<Card> cards;
-    String currentFile;
+    private String fileName;
+    private boolean changed;
     
-    public void setCards(List<Card> cards){
-        this.cards = cards;
+    
+    public Register() {
+        cards = new ArrayList<>();
+        fileName = "";
+        changed = false;
+    }
+
+
+    public List<Card> getCards(){
+        return cards;
     }
     
-    public boolean load(String fileName){
-        try {
-            TextFileLoader source = new TextFileLoader(fileName);
-            cards = source.load();
-            currentFile = fileName;
-            return true;
-        } catch (FileNotFoundException ex) {
-            return false;
-        }
+    public void load(String fileName) throws FileNotFoundException {
+
+        TextFileLoader source = new TextFileLoader(fileName);
+        cards = source.load();
+        this.fileName = fileName;
+        changed = false;
     }
-    
-    public void save(String fileName) throws IOException{
+
+    public void save(String fileName) throws IOException {
         TextFileSaver saver = new TextFileSaver(fileName);
         saver.save(cards);
+        changed = false;
     }
-    
-    public void addCard(Card card){
+
+    public void addCard(Card card) {
         cards.add(card);
+        changed = true;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public boolean hasChanged() {
+        return changed;
+    }
+
+    public void sortBy(int field) {
+        CardComparator comparator = new CardComparator(field);
+        Collections.sort(cards, comparator);
+    }
+
+    public void delete(Card card) {
+        cards.remove(card);
+        changed = true;
     }
     
+
     /**
      * Testaukseen ja kokeiluun.
      */
-    public void printAll(){
-        int i = 0;
-        for (Card card : cards){
+    public void printAll() {
+        int i = 1;
+        for (Card card : cards) {
+            System.out.println("" + i + ":");
             card.print();
             System.out.println("");
             i++;
-            System.out.println(i);
-            System.out.println("");
         }
     }
-    
-     /**
+
+    /**
      * Testaukseen ja kokeiluun.
      */
-    
-    public List<Card> search(String[] search){
-        
+    public List<Card> search(String[] search) {
+
         List<Card> returnList = new ArrayList<>();
-        for (Card card : cards){
+        for (Card card : cards) {
             if (card.compareFields(search)) {
                 returnList.add(card);
             }
