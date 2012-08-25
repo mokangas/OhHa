@@ -321,6 +321,37 @@ public class TextInterface {
     }
 
     private void editCard() {
-        //TODO
+        if (selected.size() == 0) {
+            System.out.println("Valitse ensin kortti.");
+            return;
+        }
+        if (selected.size() > 1) {
+            System.out.println("Vain yhtä korttia kerralla voi muokata.");
+            return;
+        }
+        System.out.println("----------------------");
+        Card card = selected.get(0);
+        String[] content = card.getContent();
+        for (int i = 1; i < card.NUMBER_OF_FIELDS; i++) { // The numbers visible to user are index+1
+            System.out.println(i+". " +Card.getLabels()[i] + ": "+content[i]);
+        }
+        System.out.println("-----------------------");
+        System.out.println("Syötä uudet kentät muodossa '1Uusi sisältö' tai paina ENTER, kun haluat lopettaa.");
+        String choice = input();
+        
+        while ( ! choice.equals("")){
+            try {
+                int fieldNumber = Integer.parseInt(""+choice.charAt(0)) - 1; // fieldNumber is the actualargument of content.
+                if (0 <= fieldNumber && fieldNumber < content.length) {
+                    content[fieldNumber] = choice.substring(1); //TODO testaa syöte "1
+                } else {
+                    System.out.println("Kentän numero valittu väärin.");
+                } 
+            } catch (Exception e) {
+                System.out.println("Virheellinen syöte.");
+            }
+            choice = input();
+        }
+        
     }
 }
