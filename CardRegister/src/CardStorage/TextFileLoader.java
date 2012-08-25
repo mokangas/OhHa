@@ -12,21 +12,41 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- *
+ * Loads a register from a text file. Each of the fields of cards are read from
+ * different lines in the file with no other way to separate them. This object 
+ * is used once and then disposed.
  * @author IstuvaHarka
  */
 public class TextFileLoader {
 
+    /**
+     * The scanner used to read from the text file.
+     */
     Scanner scanner;
+    /**
+     *  The path and the name of the file from which the data is read.
+     */
     String fileName;
+    /**
+     * A File object for reading the data.
+     */
     File file;
 
+    /**
+     * Sole constructor.
+     * @param fileName the path and the name of the file to be read.
+     * @throws FileNotFoundException if the file specified doesn't exist.
+     */
     public TextFileLoader(String fileName) throws FileNotFoundException {
         this.fileName = fileName;
         this.file = new File(fileName);
         this.scanner = new Scanner(file);
     }
 
+    /**
+     * Reads the file and returns it as a register to the user.
+     * @return The list of cards read from the file.
+     */
     public List<Card> load() {
         ArrayList<Card> list = new ArrayList<Card>();
         while (scanner.hasNextLine()) {
