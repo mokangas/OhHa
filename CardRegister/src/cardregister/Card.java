@@ -36,12 +36,18 @@ public class Card {
     String[] content;
 
     /**
-     * Creates a new card. 
+     * Creates a new card. Too short array or null in the parameter will cause
+     * part of the card's text fields to null. From too long parameter
      * @param textFields the content of the card to be created. What each String
      * means is specified by the static finals of this class.
      */
     public Card(String[] textFields) {
-        this.content = textFields;
+        if (textFields == null) {
+            textFields = new String[NUMBER_OF_FIELDS];
+        }
+        content = new String[NUMBER_OF_FIELDS];
+        int min = Math.min(NUMBER_OF_FIELDS, textFields.length);
+        System.arraycopy(textFields, 0, content, 0, min);
     }
 
     /**
