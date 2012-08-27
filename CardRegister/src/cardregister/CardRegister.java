@@ -23,8 +23,16 @@ public class CardRegister {
      */
     public static void main(String[] args) {
         
+        Register register = new Register();
+        try {
+            register.load("10_Cards.txt");
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(CardRegister.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
-        GraphicalUI ui = new GraphicalUI();
+        
+        GraphicalUI ui = new GraphicalUI(register);
+        ui.setCardsInUse(register.getCards());
         ui.run();
     }
 }

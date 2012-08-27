@@ -6,6 +6,7 @@ package cardregister;
 
 import CardStorage.TextFileLoader;
 import CardStorage.TextFileSaver;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,6 +60,13 @@ public class Register {
         TextFileLoader source = new TextFileLoader(fileName);
         cards = source.load();
         this.fileName = fileName;
+        changed = false;
+    }
+    
+    public void load(File file) throws FileNotFoundException{
+        TextFileLoader source = new TextFileLoader(file);
+        cards = source.load();
+        this.fileName = file.getName();
         changed = false;
     }
 

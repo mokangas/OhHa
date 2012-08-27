@@ -33,7 +33,6 @@ public class TextFileLoader {
     File file;
 
     /**
-     * Sole constructor.
      * @param fileName the path and the name of the file to be read.
      * @throws FileNotFoundException if the file specified doesn't exist.
      */
@@ -41,6 +40,17 @@ public class TextFileLoader {
         this.fileName = fileName;
         this.file = new File(fileName);
         this.scanner = new Scanner(file);
+    }
+    
+    /**
+     * 
+     * @param file The file to be read.
+     * @throws FileNotFoundException if the file doesn't exist.
+     */
+    public TextFileLoader(File file) throws FileNotFoundException{
+        this.file = file;
+        fileName = file.getName();
+        scanner = new Scanner(file);
     }
 
     /**
