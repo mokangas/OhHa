@@ -4,6 +4,7 @@
  */
 package cardregister;
 
+import UserInterfaces.GraphicalUI;
 import UserInterfaces.TextInterface;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -22,12 +23,8 @@ public class CardRegister {
      */
     public static void main(String[] args) {
         
-        String[] a = new String[Card.NUMBER_OF_FIELDS];
-        a[0] = "asdasd";
-        a[1] = "asdasdas";
-        Card card = new Card(a);
-        card.print();
-//        TextInterface ui = new TextInterface();
-//        ui.run();
+        
+        GraphicalUI ui = new GraphicalUI();
+        ui.run();
     }
 }
