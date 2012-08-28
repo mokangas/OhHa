@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package UserInterfaces;
+package UserInterfaces.graphicalUI;
 
 import java.io.File;
 import javax.swing.JFileChooser;
@@ -23,6 +23,15 @@ public class SelectFile {
     public static File openFile(JFrame frame) {
         JFileChooser chooser = new JFileChooser();
         int option = chooser.showOpenDialog(frame);
+        if (option == JFileChooser.APPROVE_OPTION) {
+            return chooser.getSelectedFile();
+        }
+        return null;
+    }
+    
+    public static File saveFile(JFrame frame){
+        JFileChooser chooser = new JFileChooser();
+        int option = chooser.showSaveDialog(frame);
         if (option == JFileChooser.APPROVE_OPTION) {
             return chooser.getSelectedFile();
         }

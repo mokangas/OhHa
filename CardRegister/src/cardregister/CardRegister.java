@@ -4,7 +4,7 @@
  */
 package cardregister;
 
-import UserInterfaces.GraphicalUI;
+import UserInterfaces.graphicalUI.GraphicalUI;
 import UserInterfaces.TextInterface;
 import java.io.FileNotFoundException;
 import java.io.IOException;

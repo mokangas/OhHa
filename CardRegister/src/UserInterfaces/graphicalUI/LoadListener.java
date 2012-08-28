@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package UserInterfaces;
+package UserInterfaces.graphicalUI;
 
 import cardregister.Register;
 import java.awt.event.MouseEvent;

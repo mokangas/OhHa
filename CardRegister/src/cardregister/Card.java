@@ -16,14 +16,14 @@ public class Card {
    * A series of integer constants whose names tell what the corresponding
    * content-String[] contain.
    */
-    static final int TITLE = 0;
-    static final int AUTHOR = 1;
-    static final int OTHER_WRITERS = 2;
-    static final int LOCATION = 3;
-    static final int YEAR = 4;
-    static final int ISBN = 5;
-    static final int KEY_WORDS = 6;
-    static final int REMARKS = 7;
+    public static final int TITLE = 0;
+    public static final int AUTHOR = 1;
+    public static final int OTHER_WRITERS = 2;
+    public static final int LOCATION = 3;
+    public static final int YEAR = 4;
+    public static final int ISBN = 5;
+    public static final int KEY_WORDS = 6;
+    public static final int REMARKS = 7;
     /**
      * The number of text fields in a card.
      */
