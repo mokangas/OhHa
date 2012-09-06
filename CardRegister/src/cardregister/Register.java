@@ -144,20 +144,33 @@ public class Register {
     }
 
     /**
-     * Testaukseen ja kokeiluun.
+     * 
+     *  A courtesy of the UI this method gives the result of a search to 
      */
-    public List<Card> search(String[] search) {
+    public Object[][] search(String[] search) {
 
-        List<Card> returnList = new ArrayList<>();
+        List<Card> searchList = new ArrayList<>();
         for (Card card : cards) {
             if (card.compareFields(search)) {
-                returnList.add(card);
+                searchList.add(card);
             }
         }
-        return returnList;
+        if (searchList == null) {
+            return null;
+        }
+        
+        return transformToObjects(searchList);
     }
 
     public void setChanged(boolean changed) {
         this.changed = changed;
+    }
+
+    private Object[][] transformToObjects(List<Card> list) {
+        Object[][] objects = new Object[list.size()][Card.NUMBER_OF_FIELDS];
+        for (int i = 0; i < list.size(); i++) {
+            objects[i] = list.get(i).getContent();
+        }
+        return objects;
     }
 }

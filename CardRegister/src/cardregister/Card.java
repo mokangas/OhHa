@@ -31,10 +31,30 @@ public class Card {
     /**
      * The names of fields which are displayed to the user.
      */
+    
     static final String[] labels = {"Nimeke", "Tekijä", "Muut kirjoittajat",
         "Sijainti", "Vuosi", "ISBN", "Avainsanat", "Muistiinpanoja"};
-    String[] content;
+    
+    /**
+     * 
+     */
+    
+    /**
+     * This tells on what text fields it is determined whether two cards are the
+     * same. True, if the text field is included in the decision.
+     */
+    
+    static final boolean[] cardEquals = {true, true, false, false, false, false, 
+        false, false};
 
+    /**
+     * The content of the text fileds of this card.
+     */
+    
+    private String[] content;
+
+    
+    
     /**
      * Creates a new card. Too short array or null in the parameter will cause
      * part of the card's text fields to null. From too long parameter
