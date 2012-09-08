@@ -14,7 +14,7 @@ public class Card {
 
   /**
    * A series of integer constants whose names tell what the corresponding
-   * content-String[] contain.
+   * content-String[] contain. TODO: Muuta privateiksi
    */
     public static final int TITLE = 0;
     public static final int AUTHOR = 1;

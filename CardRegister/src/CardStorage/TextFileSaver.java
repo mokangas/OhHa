@@ -5,6 +5,7 @@
 package CardStorage;
 
 import cardregister.Card;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
@@ -20,7 +21,7 @@ public class TextFileSaver {
     /**
      * The path and the name of the file to be created.
      */
-    String fileName;
+    File file;
     
     /**
      * A device to write file on hard disk.
@@ -32,9 +33,9 @@ public class TextFileSaver {
      * @param fileName the path and name of the file to be created.
      * @throws IOException If the save isn't successful.
      */
-    public TextFileSaver(String fileName) throws IOException{
-        this.fileName = fileName;
-        writer = new FileWriter(fileName);
+    public TextFileSaver(File file) throws IOException{
+        this.file = file;
+        writer = new FileWriter(file);
     }
     
     /**

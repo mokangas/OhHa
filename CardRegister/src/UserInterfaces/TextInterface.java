@@ -87,7 +87,7 @@ public class TextInterface {
                     saveRegister();
                     break;
                 case "k":
-                    browseRegister();
+//                    browseRegister();
                     break;
                 case "a":
                     addCard();
@@ -150,7 +150,7 @@ public class TextInterface {
      * before it being closed.
      */
     private void saveFirst() {
-        if (!register.hasChanged()) {
+        if (!register.needsToBeSaved()) {
             return;
         }
         boolean stop = false;
@@ -197,12 +197,12 @@ public class TextInterface {
     /**
      * Lets the user browse register, and select and deselect cards from it.
      */
-    private void browseRegister() {
-        if (register == null) {
-            System.out.println("Ei avointa kortistoa.\n");
-        }
-        viewList(register.getCards());
-    }
+//    private void browseRegister() {
+//        if (register == null) {
+//            System.out.println("Ei avointa kortistoa.\n");
+//        }
+//        viewList(register.getCards());
+//    }
 
     /**
      * Shows user a list of cards (the whole register or part of it), and allows

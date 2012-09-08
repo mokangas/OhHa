@@ -26,27 +26,35 @@ public class Register {
     /**
      * The file name the register was last read from or saved to.
      */
-    private String fileName;
+    
+    private File currentFile;
+    
     /**
-     * TRUE if the register has been changed since the last save, FALSE otherwise.
+     * TRUE if the register has been needsToBeSaved since the last save, FALSE otherwise.
      */
-    private boolean changed;
+    private boolean needSave;
     
     /**
      * The sole constructor.
      */
     public Register() {
         cards = new ArrayList<>();
-        fileName = "";
-        changed = false;
+        currentFile = null;
+        needSave = false;
     }
 
 /**
  * Getter to the cards in the register.
  * @return the content of the register.
  */
-    public List<Card> getCards(){
-        return cards;
+    public Object[][] getCardData(){
+        
+        Object[][] data = new Object[cards.size()][Card.getLabels().length];
+        
+        for (int i = 0; i < cards.size(); i++) {
+            data[i] = cards.get(i).getContent();
+        }
+        return data;
     }
     
     /**
@@ -57,17 +65,14 @@ public class Register {
      */
     public void load(String fileName) throws FileNotFoundException {
 
-        TextFileLoader source = new TextFileLoader(fileName);
-        cards = source.load();
-        this.fileName = fileName;
-        changed = false;
+        load(new File(fileName));
     }
     
     public void load(File file) throws FileNotFoundException{
         TextFileLoader source = new TextFileLoader(file);
         cards = source.load();
-        this.fileName = file.getName();
-        changed = false;
+        this.currentFile = file;
+        needSave = false;
     }
 
     /**
@@ -76,10 +81,14 @@ public class Register {
      * @throws IOException If the writing of the file does not succeed.
      */
     public void save(String fileName) throws IOException {
-        TextFileSaver saver = new TextFileSaver(fileName);
+        this.currentFile = new File(fileName);
+        save();
+    }
+    
+    public void save() throws IOException{
+        TextFileSaver saver = new TextFileSaver(currentFile);
         saver.save(cards);
-        changed = false;
-        this.fileName = fileName;
+        needSave = false;
     }
 
     /**
@@ -88,7 +97,7 @@ public class Register {
      */
     public void addCard(Card card) {
         cards.add(card);
-        changed = true;
+        needSave = true;
     }
 
     /**
@@ -96,21 +105,21 @@ public class Register {
      * @return  The name of the file to which this register was last saved.
      */
     public String getFileName() {
-        return fileName;
+        return currentFile.getName();
     }
 
     /**
-     * Tells if the register has changed since the last save. Register-class itself
+     * Tells if the register has needsToBeSaved since the last save. Register-class itself
      * guarantees this value to be true, if a card has been added to or removed from
      * it. Sorting doesn't change the register.
-     * @return TRUE if the file has been changed, FALSE otherwise.
+     * @return TRUE if the file has been needsToBeSaved, FALSE otherwise.
      */
-    public boolean hasChanged() {
-        return changed;
+    public boolean needsToBeSaved() {
+        return needSave;
     }
 
     /**
-     * Sorts the cards according to thealphabetical order (case ignored) 
+     * Sorts the cards according to the alphabetical order (case ignored) 
      * of the field specified by the argument. It's wise to use one of this
      * classes static variables as a parameter.
      * @param field The index of the field by which the register is sorted.
@@ -126,7 +135,7 @@ public class Register {
      */
     public void delete(Card card) {
         cards.remove(card);
-        changed = true;
+        needSave = true;
     }
     
 
@@ -161,9 +170,13 @@ public class Register {
         
         return transformToObjects(searchList);
     }
+    
+    public String[] getFieldNames(){
+        return Card.getLabels();
+    }
 
     public void setChanged(boolean changed) {
-        this.changed = changed;
+        this.needSave = changed;
     }
 
     private Object[][] transformToObjects(List<Card> list) {
@@ -172,5 +185,9 @@ public class Register {
             objects[i] = list.get(i).getContent();
         }
         return objects;
+    }
+
+    public void setCurrentFile(File file) {
+        currentFile = file;
     }
 }

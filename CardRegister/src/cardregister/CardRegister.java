@@ -9,6 +9,7 @@ import UserInterfaces.TextInterface;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.UIManager;
@@ -17,7 +18,7 @@ import javax.swing.UIManager;
  *
  * @author IstuvaHarka
  */
-public class CardRegister {
+public interface CardRegister {
 
     /**
      * @param args the command line arguments
