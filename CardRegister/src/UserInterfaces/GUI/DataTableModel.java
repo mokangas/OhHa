@@ -4,35 +4,20 @@
  */
 package UserInterfaces.GUI;
 
-import java.util.Observable;
-import java.util.Observer;
-import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author IstuvaHarka
  */
-public class DataTableModel extends AbstractTableModel implements Observer {
-
-    @Override
-    public int getRowCount() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public int getColumnCount() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Object getValueAt(int rowIndex, int columnIndex) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-        throw new UnsupportedOperationException("Not supported yet.");
+public class DataTableModel extends DefaultTableModel {
+    
+    public DataTableModel(Object[][] data, String[] columnNames){
+        super(data, columnNames);
     }
     
-    
+    @Override
+    public boolean isCellEditable(int row, int col){
+        return false;
+    }
 }

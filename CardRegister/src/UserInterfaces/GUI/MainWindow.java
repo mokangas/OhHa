@@ -84,8 +84,11 @@ public class MainWindow extends JFrame {
         JButton viewAllButton = new JButton("Näytä kaikki");
         JButton searchButton = new JButton("Etsi");
         
-        this.tableModel = new DefaultTableModel(null, fieldNames);
+        addButton.addActionListener(new NewCardListener());
+        
+        this.tableModel = new DataTableModel(null, fieldNames);
         JTable table = new JTable(tableModel);
+        table.setAutoCreateRowSorter(true);
         JScrollPane tableScrollPane = new JScrollPane(table);
         
         Container container = getContentPane();
@@ -98,11 +101,11 @@ public class MainWindow extends JFrame {
                 layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
                 .addGroup(layout.createSequentialGroup()
-                .addComponent(addButton)
-                .addComponent(deleteButton)
-                .addPreferredGap(ComponentPlacement.UNRELATED)
-                .addComponent(viewAllButton)
-                .addComponent(searchButton))
+                    .addComponent(addButton)
+                    .addComponent(deleteButton)
+                    .addPreferredGap(ComponentPlacement.UNRELATED)
+                    .addComponent(viewAllButton)
+                    .addComponent(searchButton))
                 .addComponent(tableScrollPane)));
 
         layout.setVerticalGroup(
@@ -213,9 +216,13 @@ public class MainWindow extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (control.needsToBeSaved() && saveFirstDialog()) {
-                System.out.println("TALLENNA");
+                try {
+                    saveFile();
+                } catch (IOException ex) {
+                    Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-            System.out.println("Uusi tiedosto!");
+            control.newFile();
         }
     }
 
@@ -271,5 +278,14 @@ public class MainWindow extends JFrame {
             }
             System.exit(0);
         }
+    }
+    
+    private class NewCardListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new NewCardDialog(fieldNames, control);
+        }
+        
     }
 }

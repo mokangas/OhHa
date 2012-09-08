@@ -61,4 +61,15 @@ public class Control {
         register.load(file);
         mainWindow.setData(register.getCardData());
     }
+
+    public void addNewCard(String[] content) {
+        register.createCard(content);
+        mainWindow.setData(register.getCardData());
+    }
+    
+    public void newFile(){
+        register.reset();
+        mainWindow.setData(null);
+    }
+    
 }

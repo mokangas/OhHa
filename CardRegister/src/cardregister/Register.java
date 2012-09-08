@@ -47,14 +47,20 @@ public class Register {
  * Getter to the cards in the register.
  * @return the content of the register.
  */
-    public Object[][] getCardData(){
+    public String[][] getCardData(){
         
-        Object[][] data = new Object[cards.size()][Card.getLabels().length];
-        
+        String[][] cardData = new String[cards.size()][Card.getLabels().length];
         for (int i = 0; i < cards.size(); i++) {
-            data[i] = cards.get(i).getContent();
+            cardData[i] = cards.get(i).getContent();
         }
-        return data;
+        
+        return cardData;
+//       Object[][] data = new Object[cards.size()][Card.getLabels().length];
+//        
+//        for (int i = 0; i < cards.size(); i++) {
+//            data[i] = cards.get(i).getContent();
+//        }
+//        return data; 
     }
     
     /**
@@ -98,6 +104,13 @@ public class Register {
     public void addCard(Card card) {
         cards.add(card);
         needSave = true;
+    }
+    
+    public void createCard(String[] content){
+        if (content == null) {
+            return;
+        }
+        cards.add(new Card(content));
     }
 
     /**
@@ -185,6 +198,12 @@ public class Register {
             objects[i] = list.get(i).getContent();
         }
         return objects;
+    }
+    
+    public void reset(){
+        cards.clear();
+        currentFile = null;
+        needSave = false;
     }
 
     public void setCurrentFile(File file) {
