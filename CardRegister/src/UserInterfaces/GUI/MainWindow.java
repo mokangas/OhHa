@@ -79,12 +79,15 @@ public class MainWindow extends JFrame {
 
     private void createComponents() {
 
-        JButton addButton = new JButton("Lisää kortti");
+        JButton newCardButton = new JButton("Lisää kortti");
         JButton deleteButton = new JButton("Tuhoa kortti");
         JButton viewAllButton = new JButton("Näytä kaikki");
         JButton searchButton = new JButton("Etsi");
         
-        addButton.addActionListener(new NewCardListener());
+        newCardButton.addActionListener(new NewCardListener());
+        searchButton.addActionListener(new SearchListener());
+        viewAllButton.addActionListener(new ViewallListener());
+        
         
         this.tableModel = new DataTableModel(null, fieldNames);
         JTable table = new JTable(tableModel);
@@ -101,7 +104,7 @@ public class MainWindow extends JFrame {
                 layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
                 .addGroup(layout.createSequentialGroup()
-                    .addComponent(addButton)
+                    .addComponent(newCardButton)
                     .addComponent(deleteButton)
                     .addPreferredGap(ComponentPlacement.UNRELATED)
                     .addComponent(viewAllButton)
@@ -111,7 +114,7 @@ public class MainWindow extends JFrame {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                .addComponent(addButton)
+                .addComponent(newCardButton)
                 .addComponent(deleteButton)
                 .addComponent(viewAllButton)
                 .addComponent(searchButton))
@@ -141,6 +144,7 @@ public class MainWindow extends JFrame {
         file.add(quitItem);
 
         JMenuItem helpItem = new JMenuItem("Ohje");
+        helpItem.addActionListener(new HelpMenuitemListener());
         JMenu helpBar = new JMenu("Ohje");
         helpBar.add(helpItem);
 
@@ -183,11 +187,23 @@ public class MainWindow extends JFrame {
         }
     }
     
-    public void loadFile() throws FileNotFoundException{
+    private void loadFile() throws FileNotFoundException{
         JFileChooser chooser = new JFileChooser();
             if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 control.loadFile(chooser.getSelectedFile());
             }
+    }
+    
+    private void newCard(){
+        new NewCardDialog(this, fieldNames, control);
+    }
+    
+    private void search(){
+        new CardSearchDialog(this, fieldNames, control);
+    }
+    
+    private void showManual(){
+        new Manual(this);
     }
 
     public void setData(Object[][] newData) {
@@ -284,7 +300,35 @@ public class MainWindow extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new NewCardDialog(fieldNames, control);
+//            new NewCardDialog(fieldNames, control);
+              newCard();
+        }
+        
+    }
+    
+    private class SearchListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+              search();
+        }
+        
+    }
+    
+    private class ViewallListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            control.viewAll();
+        }
+        
+    }
+    
+    private class HelpMenuitemListener implements ActionListener{
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            showManual();
         }
         
     }

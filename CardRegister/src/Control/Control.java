@@ -71,5 +71,16 @@ public class Control {
         register.reset();
         mainWindow.setData(null);
     }
+
+    public void search(String[] searchWords) {
+        String[][] newData = register.search(searchWords);
+        if (newData != null) {
+            mainWindow.setData(newData);
+        }
+    }
+
+    public void viewAll() {
+        mainWindow.setData(register.getCardData());
+    }
     
 }

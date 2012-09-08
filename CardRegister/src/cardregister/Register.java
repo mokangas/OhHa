@@ -169,7 +169,7 @@ public class Register {
      * 
      *  A courtesy of the UI this method gives the result of a search to 
      */
-    public Object[][] search(String[] search) {
+    public String[][] search(String[] search) {
 
         List<Card> searchList = new ArrayList<>();
         for (Card card : cards) {
@@ -181,7 +181,11 @@ public class Register {
             return null;
         }
         
-        return transformToObjects(searchList);
+        String[][] results = new String[searchList.size()][Card.getLabels().length];
+        for (int i = 0; i < searchList.size() ; i++) {
+            results[i] = searchList.get(i).getContent();
+        }
+        return results;
     }
     
     public String[] getFieldNames(){
@@ -190,14 +194,6 @@ public class Register {
 
     public void setChanged(boolean changed) {
         this.needSave = changed;
-    }
-
-    private Object[][] transformToObjects(List<Card> list) {
-        Object[][] objects = new Object[list.size()][Card.NUMBER_OF_FIELDS];
-        for (int i = 0; i < list.size(); i++) {
-            objects[i] = list.get(i).getContent();
-        }
-        return objects;
     }
     
     public void reset(){

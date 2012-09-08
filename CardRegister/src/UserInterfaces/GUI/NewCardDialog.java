@@ -12,6 +12,7 @@ import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
@@ -23,7 +24,7 @@ import javax.swing.WindowConstants;
  *
  * @author IstuvaHarka
  */
-public class NewCardDialog extends JFrame {
+public class NewCardDialog extends JDialog {
 
     private String[] fieldNames;
     private JTextField[] textFields;
@@ -31,8 +32,9 @@ public class NewCardDialog extends JFrame {
     private int components;
     private Control control;
 
-    public NewCardDialog(String[] fieldNames, Control control) {
-
+    public NewCardDialog(JFrame owner, String[] fieldNames, Control control) {
+        
+        super(owner);
         this.fieldNames = fieldNames;
         this.components = fieldNames.length;
         this.control = control;
