@@ -205,4 +205,38 @@ public class Register {
     public void setCurrentFile(File file) {
         currentFile = file;
     }
+
+    public File getCurrentFile() {
+        return currentFile;
+    }
+    
+    private Card findCard(String[] content){
+        for (Card card :cards){
+            for (int i = 0; i < card.getContent().length ; i++) {
+                if ( ! content[i].equals(card.getContent()[i])) {
+                    continue;
+                }
+                return card;
+            }
+        }
+        return null;
+    }
+    
+    public void editCard(String[] cardData, String[] newData){
+        // There should be exavtly one card that has the exact same data:
+        // It's prohibited to add two cards with the exact same
+        // content, and this method is not (should not be) 
+        // invoked when there's no card with the given data.
+        
+        findCard(cardData).setContent(newData);
+        needSave = true;
+    }
+
+    public void deleteCards(String[][] toBeDeleted) {
+        for (int i = 0; i < toBeDeleted.length; i++) {
+            Card card = findCard(toBeDeleted[i]);
+            cards.remove(card);
+        }
+        needSave = true;
+    }
 }

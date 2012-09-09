@@ -10,6 +10,8 @@ import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -48,6 +50,7 @@ public class MainWindow extends JFrame {
 
     private Control control;
     private String[] fieldNames;
+    private JTable table;
     private DefaultTableModel tableModel;
 
     public MainWindow(Control control, String[] fieldNames) {
@@ -79,21 +82,27 @@ public class MainWindow extends JFrame {
 
     private void createComponents() {
 
-        JButton newCardButton = new JButton("Lisää kortti");
+        JButton newCardButton = new JButton("Lisää");
+        JButton viewCardButton = new JButton("Näytä");
+        JButton editCardButton = new JButton("Muokkaa");
         JButton deleteButton = new JButton("Tuhoa kortti");
         JButton viewAllButton = new JButton("Näytä kaikki");
         JButton searchButton = new JButton("Etsi");
-        
+
         newCardButton.addActionListener(new NewCardListener());
-        searchButton.addActionListener(new SearchListener());
+        viewCardButton.addActionListener(new ViewcardListener());
+        editCardButton.addActionListener(new EditcardListener());
+        deleteButton.addActionListener(new CardDeleteListener());
         viewAllButton.addActionListener(new ViewallListener());
-        
-        
+        searchButton.addActionListener(new SearchListener());
+
+
         this.tableModel = new DataTableModel(null, fieldNames);
-        JTable table = new JTable(tableModel);
+        this.table = new JTable(tableModel);
         table.setAutoCreateRowSorter(true);
+        table.addMouseListener(new TableClickListener());
         JScrollPane tableScrollPane = new JScrollPane(table);
-        
+
         Container container = getContentPane();
         GroupLayout layout = new GroupLayout(container);
         container.setLayout(layout);
@@ -104,17 +113,21 @@ public class MainWindow extends JFrame {
                 layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
                 .addGroup(layout.createSequentialGroup()
-                    .addComponent(newCardButton)
-                    .addComponent(deleteButton)
-                    .addPreferredGap(ComponentPlacement.UNRELATED)
-                    .addComponent(viewAllButton)
-                    .addComponent(searchButton))
+                .addComponent(newCardButton)
+                .addComponent(viewCardButton)
+                .addComponent(editCardButton)
+                .addComponent(deleteButton)
+                .addPreferredGap(ComponentPlacement.UNRELATED)
+                .addComponent(viewAllButton)
+                .addComponent(searchButton))
                 .addComponent(tableScrollPane)));
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                 .addComponent(newCardButton)
+                .addComponent(viewCardButton)
+                .addComponent(editCardButton)
                 .addComponent(deleteButton)
                 .addComponent(viewAllButton)
                 .addComponent(searchButton))
@@ -186,27 +199,50 @@ public class MainWindow extends JFrame {
             control.save();
         }
     }
-    
-    private void loadFile() throws FileNotFoundException{
+
+    private void loadFile() throws FileNotFoundException {
         JFileChooser chooser = new JFileChooser();
-            if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                control.loadFile(chooser.getSelectedFile());
-            }
-    }
-    
-    private void newCard(){
-        new NewCardDialog(this, fieldNames, control);
-    }
-    
-    private void search(){
-        new CardSearchDialog(this, fieldNames, control);
-    }
-    
-    private void showManual(){
-        new Manual(this);
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            control.loadFile(chooser.getSelectedFile());
+        }
     }
 
-    public void setData(Object[][] newData) {
+    private void newCard() {
+        new NewCardDialog(this, fieldNames, control);
+    }
+
+    private void search() {
+        new CardSearchDialog(this, fieldNames, control);
+    }
+
+    private void showManual() {
+        new Manual(this);
+    }
+    
+    private void editCard(){
+            new CardEditDialog(this, fieldNames, control, tableModel, table.getSelectedRow());
+    }
+    
+    private void deleteCard(){
+        // Asks for confirmation first
+        String message = "Haluatko todella tuhota valitut kortit?";
+        Object[] options = {"Kyllä", "Ei"};
+        int confirmation = JOptionPane.showOptionDialog(this, message, "Tuhoa kortit?", 
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
+        
+        // If canceled, nothing will happen. If confirmed, this will happen:
+        if (confirmation == JOptionPane.YES_OPTION) {
+            String[][] deleted = new String[table.getSelectedRowCount()][fieldNames.length];
+            for (int i = 0; i < table.getSelectedRowCount(); i++) {
+                for (int j = 0; j < fieldNames.length; j++) {
+                    deleted[i][j] = (String) tableModel.getValueAt(table.getSelectedRows()[i], j);
+                }
+            }
+            control.deleteCards(deleted);
+        }
+    }
+
+    public void setCardTableData(Object[][] newData) {
         tableModel.setDataVector(newData, fieldNames);
     }
 
@@ -216,12 +252,12 @@ public class MainWindow extends JFrame {
         public void actionPerformed(ActionEvent e) {
             try {
                 if (control.needsToBeSaved() && saveFirstDialog()) {
-                saveFile();
-            }
+                    saveFile();
+                }
                 loadFile();
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex){
+            } catch (IOException ex) {
                 //Talennus ei onnistunut
             }
         }
@@ -295,41 +331,95 @@ public class MainWindow extends JFrame {
             System.exit(0);
         }
     }
-    
+
     private class NewCardListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
 //            new NewCardDialog(fieldNames, control);
-              newCard();
+            newCard();
         }
-        
     }
-    
+
     private class SearchListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-              search();
+            search();
         }
-        
     }
-    
+
     private class ViewallListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             control.viewAll();
         }
+    }
+
+    private class ViewcardListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (table.getSelectedRowCount() == 1) {
+            new CardView(fieldNames, control, tableModel, table.getSelectedRow());
+            }
+        }
+    }
+    
+    private class EditcardListener implements ActionListener{
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (table.getSelectedRowCount() == 1) {
+                editCard();
+            }
+        }
         
     }
     
-    private class HelpMenuitemListener implements ActionListener{
+    private class CardDeleteListener implements ActionListener{
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (table.getSelectedRowCount() > 0 ){
+            deleteCard();
+            }
+        }
+        
+    }
+
+    private class HelpMenuitemListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             showManual();
         }
-        
+    }
+
+    private class TableClickListener implements MouseListener {
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.getClickCount() == 2) {
+                new CardView(fieldNames, control, tableModel, table.getSelectedRow());
+            }
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+        }
     }
 }

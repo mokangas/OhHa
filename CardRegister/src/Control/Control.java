@@ -9,8 +9,6 @@ import cardregister.Register;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -28,16 +26,6 @@ public class Control {
     public Control() {
         register = new Register();
         String[] fieldNames = register.getFieldNames();
-        // Poistetaan myöhemmin:
-//        Object[][] data =null;
-//        try {
-//            
-//            register.load("10_Cards.txt");
-//            data = register.getCardData();
-//        } catch (FileNotFoundException ex) {
-//            Logger.getLogger(Control.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-                
         mainWindow = new MainWindow(this, fieldNames);
     }
     
@@ -46,7 +34,7 @@ public class Control {
     }
     
     public File getCurrentFile(){
-        return null;
+        return register.getCurrentFile();
     }
     
     public void setCurrentFile(File file){
@@ -59,28 +47,39 @@ public class Control {
     
     public void loadFile(File file) throws FileNotFoundException{
         register.load(file);
-        mainWindow.setData(register.getCardData());
+        mainWindow.setCardTableData(register.getCardData());
     }
 
     public void addNewCard(String[] content) {
         register.createCard(content);
-        mainWindow.setData(register.getCardData());
+        mainWindow.setCardTableData(register.getCardData());
     }
     
     public void newFile(){
         register.reset();
-        mainWindow.setData(null);
+        mainWindow.setCardTableData(null);
     }
 
     public void search(String[] searchWords) {
         String[][] newData = register.search(searchWords);
         if (newData != null) {
-            mainWindow.setData(newData);
+            mainWindow.setCardTableData(newData);
         }
     }
 
     public void viewAll() {
-        mainWindow.setData(register.getCardData());
+        mainWindow.setCardTableData(register.getCardData());
     }
+
+    public void editCard(String[] oldData, String[] newData) {
+        register.editCard(oldData, newData);
+        mainWindow.setCardTableData(register.getCardData());
+    }
+
+    public void deleteCards(String[][] toBeDeleted) {
+        register.deleteCards(toBeDeleted);
+        mainWindow.setCardTableData(register.getCardData());
+    }
+    
     
 }
