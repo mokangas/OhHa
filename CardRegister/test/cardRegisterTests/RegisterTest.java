@@ -60,19 +60,19 @@ public class RegisterTest {
         assertFalse(register.needsToBeSaved());
     }
     
-    @Test
-    public void hasChangedWhenCardAdded(){
-        register.addCard(card);
-        assertTrue(register.needsToBeSaved());
-    }
+//    @Test
+//    public void hasChangedWhenCardAdded(){
+//        register.addCard(card);
+//        assertTrue(register.needsToBeSaved());
+//    }
     
-    @Test
-    public void deletingCardMarksChanged(){
-        register.addCard(card);
-        register.setChanged(false);
-        register.delete(card);
-        assertTrue(register.needsToBeSaved());
-    }
+//    @Test
+//    public void deletingCardMarksChanged(){
+//        register.addCard(card);
+//        register.setChanged(false);
+//        register.delete(card);
+//        assertTrue(register.needsToBeSaved());
+//    }
 
     
     @After

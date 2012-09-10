@@ -50,7 +50,7 @@ public class Control {
         mainWindow.setCardTableData(register.getCardData());
     }
 
-    public void addNewCard(String[] content) {
+    public void addNewCard(String[] content) throws Exception {
         register.createCard(content);
         mainWindow.setCardTableData(register.getCardData());
     }

@@ -5,17 +5,18 @@
 package cardregister;
 
 /**
- * Cards which contain information of books. The information is presented
- * in a array of Strings. Each String should contain the information corresponding
- * to the static finals defined in this class.
+ * Cards which contain information of books. The information is presented in a
+ * array of Strings. Each String should contain the information corresponding to
+ * the static finals defined in this class.
+ *
  * @author IstuvaHarka
  */
 public class Card {
 
-  /**
-   * A series of integer constants whose names tell what the corresponding
-   * content-String[] contain. TODO: Muuta privateiksi
-   */
+    /**
+     * A series of integer constants whose names tell what the corresponding
+     * content-String[] contain. TODO: Muuta privateiksi
+     */
     public static final int TITLE = 0;
     public static final int AUTHOR = 1;
     public static final int OTHER_WRITERS = 2;
@@ -31,33 +32,26 @@ public class Card {
     /**
      * The names of fields which are displayed to the user.
      */
-    
     static final String[] labels = {"Nimeke", "Tekijä", "Muut kirjoittajat",
         "Sijainti", "Vuosi", "ISBN", "Avainsanat", "Muistiinpanoja"};
-    
     /**
-     * 
+     *
      */
-    
     /**
      * This tells on what text fields it is determined whether two cards are the
      * same. True, if the text field is included in the decision.
      */
-    
-    static final boolean[] cardEquals = {true, true, false, false, false, false, 
+    static final boolean[] cardEquals = {true, true, false, false, false, false,
         false, false};
-
     /**
      * The content of the text fileds of this card.
      */
-    
     private String[] content;
 
-    
-    
     /**
      * Creates a new card. Too short array or null in the parameter will cause
      * part of the card's text fields to null. From too long parameter
+     *
      * @param textFields the content of the card to be created. What each String
      * means is specified by the static finals of this class.
      */
@@ -72,39 +66,43 @@ public class Card {
 
     /**
      * Returns the content of this card.
+     *
      * @return content as an array of Strings.
      */
     public String[] getContent() {
         return content;
     }
-    
+
     /**
      * Sets a new content to this card.
+     *
      * @param newContent The new content.
      */
-    public void setContent(String[] newContent){
+    public void setContent(String[] newContent) {
         content = newContent;
-    }
-    
-    /**
-     * Changes the information in one text field of this card.
-     * @param fieldNumber The field whose information will be changed. Using the
-     * static finals of this class is advised.
-     * @param newText 
-     */
-    public void changeField(int fieldNumber, String newText){
-        content[fieldNumber]= newText;
     }
 
     /**
-     * Tells what type of content text fields of this card has. These are the 
+     * Changes the information in one text field of this card.
+     *
+     * @param fieldNumber The field whose information will be changed. Using the
+     * static finals of this class is advised.
+     * @param newText
+     */
+    public void changeField(int fieldNumber, String newText) {
+        content[fieldNumber] = newText;
+    }
+
+    /**
+     * Tells what type of content text fields of this card has. These are the
      * names which are displayed to the user.
+     *
      * @return The names of the text fields.
      */
-    public static String[] getLabels(){
+    public static String[] getLabels() {
         return labels;
     }
-    
+
     /**
      * TESTAUSTA JA KOKEILUA VARTEN
      */
@@ -113,8 +111,6 @@ public class Card {
             System.out.println(content[i]);
         }
     }
-    
-   
 
     /**
      * Testaukseen ja kokeiluun.
@@ -133,20 +129,39 @@ public class Card {
      * Compares the input to the content of the card. In order to pass this, the
      * content of each text field in this card must contain as a substring the
      * given Strings. The comparison is not case sensitive.
-     * @param comparedTo The Strings which are searched from the content of this
-     * card.
+     *
+     * @param text The Strings which are searched from the content of this card.
      * @return TRUE if all the fields contain the searched Strings, FALSE if one
      * or more search words aren't found.
      */
-    public boolean compareFields(String[] comparedTo) {
+    public boolean fieldsInclude(String[] text) {
         for (int i = 0; i < NUMBER_OF_FIELDS; i++) {
             String fieldLowerCase = content[i].toLowerCase();
-            String comparator = comparedTo[i].toLowerCase().trim();
+            String comparator = text[i].toLowerCase().trim();
             if (!fieldLowerCase.contains(comparator)) {
                 return false;
             }
         }
         return true;
     }
-    
+
+    public boolean isRelativelyEqualTo(String[] comparedTo) {
+        for (int i = 0; i < NUMBER_OF_FIELDS; i++) {
+            if (cardEquals[i]) {
+                if ( ! content[i].trim().toLowerCase().equals(comparedTo[i].trim().toLowerCase())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean contentEqualsTo(String[] text) {
+        for (int i = 0; i < NUMBER_OF_FIELDS; i++) {
+            if (!content[i].trim().toLowerCase().equals(text[i].trim().toLowerCase())) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

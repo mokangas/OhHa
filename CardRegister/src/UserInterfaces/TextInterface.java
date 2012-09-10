@@ -249,7 +249,7 @@ public class TextInterface {
             System.out.print(Card.getLabels()[i] + ": ");
             fields[i] = input();
         }
-        register.addCard(new Card(fields));
+//        register.addCard(new Card(fields));
     }
 
     /**
@@ -341,7 +341,7 @@ public class TextInterface {
      */
     private void deleteCards() {
         for (Card card : selected) {
-            register.delete(card);
+//            register.delete(card);
         }
         selected.clear();
         System.out.println("Valitut kortit tuhottu.");
@@ -383,6 +383,6 @@ public class TextInterface {
             }
             choice = input();
         }
-        register.setChanged(true);
+//        register.setChanged(true);
     }
 }

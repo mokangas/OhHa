@@ -6,6 +6,8 @@ package cardregister;
 
 import CardStorage.TextFileLoader;
 import CardStorage.TextFileSaver;
+import Control.ExceptionsThrownByRegister;
+import Control.ExceptionsThrownByRegister.NullInputException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -101,16 +103,34 @@ public class Register {
      * Adds card to the register.
      * @param card The card to be added.
      */
-    public void addCard(Card card) {
-        cards.add(card);
-        needSave = true;
-    }
+//    public void addCard(Card card) {
+//        cards.add(card);
+//        needSave = true;
+//    }
     
-    public void createCard(String[] content){
-        if (content == null) {
-            return;
+    public void createCard(String[] content) throws Exception{
+        
+        // Check if all the fields are empty
+        boolean contentIsEmpty = true;
+        for (int i = 0; i < Card.NUMBER_OF_FIELDS; i++) {
+            if ( ! content[i].equals("")) {
+                contentIsEmpty = false;
+                break;
+            }
         }
+        if (contentIsEmpty) {
+            throw new NullInputException();
+        }
+        
+        //Check if there is already cards that are relatively similar.
+        String[][] similarCards = searchRelativelySimilarCardsData(content);
+        if (similarCards != null) {
+            throw new ExceptionsThrownByRegister.AlmostSameCardExistsException(similarCards);
+        }
+        
+        // If all the above checks are passed, a new card is created.
         cards.add(new Card(content));
+        needSave = true;
     }
 
     /**
@@ -145,25 +165,25 @@ public class Register {
     /**
      * Removes the specified card from the register.
      * @param card The card to be removed.
-     */
-    public void delete(Card card) {
-        cards.remove(card);
-        needSave = true;
-    }
+//     */
+//    public void delete(Card card) {
+//        cards.remove(card);
+//        needSave = true;
+//    }
     
 
     /**
      * Testaukseen ja kokeiluun.
      */
-    public void printAll() {
-        int i = 1;
-        for (Card card : cards) {
-            System.out.println("" + i + ":");
-            card.print();
-            System.out.println("");
-            i++;
-        }
-    }
+//    public void printAll() {
+//        int i = 1;
+//        for (Card card : cards) {
+//            System.out.println("" + i + ":");
+//            card.print();
+//            System.out.println("");
+//            i++;
+//        }
+//    }
 
     /**
      * 
@@ -173,7 +193,7 @@ public class Register {
 
         List<Card> searchList = new ArrayList<>();
         for (Card card : cards) {
-            if (card.compareFields(search)) {
+            if (card.fieldsInclude(search)) {
                 searchList.add(card);
             }
         }
@@ -192,9 +212,9 @@ public class Register {
         return Card.getLabels();
     }
 
-    public void setChanged(boolean changed) {
-        this.needSave = changed;
-    }
+//    public void setChanged(boolean changed) {
+//        this.needSave = changed;
+//    }
     
     public void reset(){
         cards.clear();
@@ -212,10 +232,7 @@ public class Register {
     
     private Card findCard(String[] content){
         for (Card card :cards){
-            for (int i = 0; i < card.getContent().length ; i++) {
-                if ( ! content[i].equals(card.getContent()[i])) {
-                    continue;
-                }
+            if (card.contentEqualsTo(content)) {
                 return card;
             }
         }
@@ -238,5 +255,23 @@ public class Register {
             cards.remove(card);
         }
         needSave = true;
+    }
+
+    private String[][] searchRelativelySimilarCardsData(String[] content) {
+        ArrayList<Card> foundCards = new ArrayList<Card>();
+        for (Card card : cards){
+            if (card.isRelativelyEqualTo(content)) {
+                foundCards.add(card);
+            }
+        }
+        if (foundCards.size() == 0) {
+            return null;
+        }
+        
+        String[][] data = new String[foundCards.size()][Card.NUMBER_OF_FIELDS];
+        for (int i = 0; i < foundCards.size(); i++) {
+            data[i] = foundCards.get(i).getContent();
+        }
+        return data;
     }
 }

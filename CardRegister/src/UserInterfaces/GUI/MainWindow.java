@@ -41,6 +41,7 @@ import javax.swing.WindowConstants;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import Control.ExceptionsThrownByRegister;
 
 /**
  *
@@ -85,7 +86,7 @@ public class MainWindow extends JFrame {
         JButton newCardButton = new JButton("Lisää");
         JButton viewCardButton = new JButton("Näytä");
         JButton editCardButton = new JButton("Muokkaa");
-        JButton deleteButton = new JButton("Tuhoa kortti");
+        JButton deleteButton = new JButton("Tuhoa kortit");
         JButton viewAllButton = new JButton("Näytä kaikki");
         JButton searchButton = new JButton("Etsi");
 
@@ -145,7 +146,7 @@ public class MainWindow extends JFrame {
         loadFileItem.addActionListener(new LoadFileListener());
         newFileItem.addActionListener(new NewFileListener());
         saveFileItem.addActionListener(new SaveFileListener());
-        saveAsItem.addActionListener(new SaveFileListener());
+        saveAsItem.addActionListener(new SaveAsListener());
         quitItem.addActionListener(new QuitListener());
 
         JMenu file = new JMenu("Tiedosto");
@@ -188,12 +189,7 @@ public class MainWindow extends JFrame {
 
     private void saveAs() throws IOException {
         File current = control.getCurrentFile();
-        String directoryPath = "";
-        if (current != null) {
-            directoryPath = current.getPath();
-        }
-
-        JFileChooser chooser = new JFileChooser(directoryPath);
+        JFileChooser chooser = new JFileChooser(current);
         if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             control.setCurrentFile(chooser.getSelectedFile());
             control.save();

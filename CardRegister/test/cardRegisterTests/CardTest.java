@@ -117,7 +117,7 @@ public class CardTest {
 
     @Test
     public void compareFieldsWorksWithMatchingFields() {
-        assertTrue(testCard.compareFields(input));
+        assertTrue(testCard.fieldsInclude(input));
     }
 
     @Test
@@ -128,19 +128,19 @@ public class CardTest {
             input[i] = input[i].substring(start, end);
         }
 
-        assertTrue(testCard.compareFields(input));
+        assertTrue(testCard.fieldsInclude(input));
     }
 
     @Test
     public void compareFieldWorksWithSomeEmptyFields() {
         input[0] = "";
-        assertTrue(testCard.compareFields(input));
+        assertTrue(testCard.fieldsInclude(input));
     }
 
     @Test
     public void compareFieldsGivesFalsesToo() {
         input[0] = input[0] + "a";
-        assertFalse(testCard.compareFields(input));
+        assertFalse(testCard.fieldsInclude(input));
 
         String firstField = testCard.getContent()[0];
         String test = "qwertyuioopsdfghjklzxcvbnmsdlhgasdfkljahsdfkljhfsdflh";
@@ -151,7 +151,7 @@ public class CardTest {
             }
         }
         input[0] = test;
-        assertFalse(testCard.compareFields(input));
+        assertFalse(testCard.fieldsInclude(input));
     }
 
     @Test
