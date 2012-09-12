@@ -94,6 +94,7 @@ public class CardView extends JFrame {
         }
 
         JButton closeButton = new JButton("Sulje");
+        closeButton.setMnemonic('S');
         closeButton.addActionListener(new ClosebuttonListener());
         c.gridx = 0;
         c.gridy = components;
@@ -101,6 +102,7 @@ public class CardView extends JFrame {
         add(closeButton, c);
 
         JButton editButton = new JButton("Muokkaa");
+        editButton.setMnemonic('M');
         editButton.addActionListener(new EditbuttonListener());
         c.gridx = 1;
         c.gridy = components;

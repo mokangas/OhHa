@@ -89,13 +89,18 @@ public class CardEditDialog extends JDialog {
             c.gridx = 0;
             c.gridy = i+1;
             c.ipadx = 0;
-        c.anchor = GridBagConstraints.FIRST_LINE_END;
+            //c.weightx = 1;
+            c.anchor = GridBagConstraints.FIRST_LINE_START;
+            c.fill = GridBagConstraints.WEST;
             add(texts[i], c);
             oldData[i] = (String) tableModel.getValueAt(row, i);
             textFields[i] = new JTextField(oldData[i]);
             c.gridx = 1;
             c.gridy = i+1;
-            c.ipadx = 2;
+            c.ipadx = 120;
+            //c.weightx = 6;
+            c.anchor = GridBagConstraints.FIRST_LINE_START;
+            c.fill = GridBagConstraints.HORIZONTAL;
             add(textFields[i], c);
         }
 
@@ -115,12 +120,14 @@ public class CardEditDialog extends JDialog {
         add(textArea, c);
         
         JButton saveChanges = new JButton("Tallenna muutokset");
+        saveChanges.setMnemonic('T');
         saveChanges.addActionListener(new EditSaveListener());
         c.gridx = 0;
         c.gridy = components+1;
         add(saveChanges, c);
         
         JButton cancel = new JButton("Peruuta");
+        cancel.setMnemonic('P');
         cancel.addActionListener(new CancelListener());
         c.gridx = 1;
         c.gridy = components+1;

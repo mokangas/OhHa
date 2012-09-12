@@ -93,6 +93,7 @@ public class CardSearchDialog extends JDialog {
         }
 
         JButton search = new JButton("Hae");
+        search.setMnemonic('H');
         search.addActionListener(new SearchbuttonListener());
         c.gridx = 0;
         c.gridy = components + 1;
@@ -100,6 +101,7 @@ public class CardSearchDialog extends JDialog {
         add(search, c);
         
         JButton cancel = new JButton("Peruuta");
+        cancel.setMnemonic('P');
         cancel.addActionListener(new CancelButtonListener());
         c.gridx = 1;
         c.gridy = components + 1;

@@ -122,6 +122,7 @@ public class NewCardDialog extends JDialog {
         add(textArea, c);
 
         JButton addCard = new JButton("Lisää");
+        addCard.setMnemonic('L');
         addCard.addActionListener(new NewCardListener());
 
         c.gridx = 0;
@@ -133,6 +134,7 @@ public class NewCardDialog extends JDialog {
         add(addCard, c);
 
         JButton cancel = new JButton("Peruuta");
+        cancel.setMnemonic('P');
         cancel.addActionListener(new CancelListener());
         c.gridx = 1;
         c.gridy = components + 1;

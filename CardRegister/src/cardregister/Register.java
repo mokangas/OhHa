@@ -187,7 +187,7 @@ public class Register {
 
     /**
      * 
-     *  A courtesy of the UI this method gives the result of a search to 
+     *  A courtesy of the UI this method gives the result of a searchAnyField to 
      */
     public String[][] search(String[] search) {
 
@@ -197,24 +197,23 @@ public class Register {
                 searchList.add(card);
             }
         }
-        if (searchList == null) {
-            return null;
-        }
         
-        String[][] results = new String[searchList.size()][Card.getLabels().length];
-        for (int i = 0; i < searchList.size() ; i++) {
-            results[i] = searchList.get(i).getContent();
-        }
-        return results;
+        return transformCardsToRawData(searchList);
     }
     
     public String[] getFieldNames(){
         return Card.getLabels();
     }
 
-//    public void setChanged(boolean changed) {
-//        this.needSave = changed;
-//    }
+    public String[][] searchAnyField(String searchWord){
+        ArrayList<Card> searchResults = new ArrayList<Card>();
+        for (Card card : cards){
+            if (card.searchAnyField(searchWord)) {
+                searchResults.add(card);
+            }
+        }
+        return transformCardsToRawData(searchResults);
+    }
     
     public void reset(){
         cards.clear();
@@ -280,13 +279,27 @@ public class Register {
                 foundCards.add(card);
             }
         }
-        if (foundCards.size() == 0) {
+        
+        return transformCardsToRawData(foundCards);
+//        if (foundCards.size() == 0) {
+//            return null;
+//        }
+//        
+//        String[][] data = new String[foundCards.size()][Card.NUMBER_OF_FIELDS];
+//        for (int i = 0; i < foundCards.size(); i++) {
+//            data[i] = foundCards.get(i).getContent();
+//        }
+//        return data;
+    }
+    
+    private String[][] transformCardsToRawData(List<Card> cardList){
+        if (cardList.size() == 0) {
             return null;
         }
         
-        String[][] data = new String[foundCards.size()][Card.NUMBER_OF_FIELDS];
-        for (int i = 0; i < foundCards.size(); i++) {
-            data[i] = foundCards.get(i).getContent();
+        String[][] data = new String[cardList.size()][Card.NUMBER_OF_FIELDS];
+        for (int i = 0; i < cardList.size(); i++) {
+            data[i] = cardList.get(i).getContent(); 
         }
         return data;
     }

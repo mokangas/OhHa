@@ -113,12 +113,11 @@ public class Card {
     }
 
     /**
-     * Testaukseen ja kokeiluun.
+     * Testaukseen ja kokeiluun. EI ENÄÄ!
      */
-    public boolean search(String search) {
+    public boolean searchAnyField(String search) {
         for (int i = 0; i < NUMBER_OF_FIELDS; i++) {
-            String toLowerCase = content[i].toLowerCase();
-            if (toLowerCase.contains(search)) {
+            if (content[i].toLowerCase().contains(search.trim().toLowerCase())) {
                 return true;
             }
         }
@@ -132,7 +131,7 @@ public class Card {
      *
      * @param text The Strings which are searched from the content of this card.
      * @return TRUE if all the fields contain the searched Strings, FALSE if one
-     * or more search words aren't found.
+     * or more searchAnyField words aren't found.
      */
     public boolean fieldsInclude(String[] text) {
         for (int i = 0; i < NUMBER_OF_FIELDS; i++) {

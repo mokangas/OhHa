@@ -43,7 +43,13 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import Control.ExceptionsThrownByRegister;
 import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridLayout;
+import java.awt.event.KeyEvent;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 /**
  *
@@ -71,7 +77,7 @@ public class MainWindow extends JFrame {
                 try {
                     UIManager.setLookAndFeel("Windows");
                 } catch (Exception e3) {
-                     //Uses the default.
+                    //Uses the default.
                 }
             }
         }
@@ -93,7 +99,14 @@ public class MainWindow extends JFrame {
         JButton editCardButton = new JButton("Muokkaa");
         JButton deleteButton = new JButton("Tuhoa kortit");
         JButton viewAllButton = new JButton("Näytä kaikki");
-        JButton searchButton = new JButton("Etsi");
+        JButton searchButton = new JButton("Tarkka haku");
+
+        newCardButton.setMnemonic('L');
+        viewCardButton.setMnemonic('N');
+        editCardButton.setMnemonic('M');
+        deleteButton.setMnemonic('u');
+        viewAllButton.setMnemonic('k');
+        searchButton.setMnemonic('a');
 
         newCardButton.addActionListener(new NewCardListener());
         viewCardButton.addActionListener(new ViewcardListener());
@@ -102,6 +115,7 @@ public class MainWindow extends JFrame {
         viewAllButton.addActionListener(new ViewallListener());
         searchButton.addActionListener(new SearchListener());
 
+        JPanel searchPanel = createSearchPanel();
 
         this.tableModel = new DataTableModel(null, fieldNames);
         this.table = new JTable(tableModel);
@@ -127,6 +141,7 @@ public class MainWindow extends JFrame {
                 .addPreferredGap(ComponentPlacement.UNRELATED)
                 .addComponent(viewAllButton)
                 .addComponent(searchButton))
+                .addComponent(searchPanel)
                 .addComponent(tableScrollPane)));
 
         layout.setVerticalGroup(
@@ -139,16 +154,45 @@ public class MainWindow extends JFrame {
                 .addComponent(deleteButton)
                 .addComponent(viewAllButton)
                 .addComponent(searchButton))
+                .addComponent(searchPanel)
                 .addComponent(tableScrollPane));
+    }
+
+    private JPanel createSearchPanel() {
+        JPanel searchPanel = new JPanel();
+        GroupLayout layout = new GroupLayout(searchPanel);
+        searchPanel.setLayout(layout);
+
+        JTextField quickSearchField = new JTextField(10);
+        JButton quickSearchButton = new JButton("Hae");
+        quickSearchButton.setMnemonic('H');
+        quickSearchButton.addActionListener(new QuickSearchListener(quickSearchField));
+
+        layout.setHorizontalGroup(
+                layout.createSequentialGroup()
+                .addComponent(quickSearchField)
+                .addComponent(quickSearchButton));
+
+        layout.setVerticalGroup(
+                layout.createParallelGroup()
+                .addComponent(quickSearchField, GroupLayout.PREFERRED_SIZE,
+                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(quickSearchButton));
+
+        return searchPanel;
     }
 
     private void createMenu() {
 
         JMenuItem newFileItem = new JMenuItem("Uusi tiedosto");
-        JMenuItem loadFileItem = new JMenuItem("Lataa tiedosto");
+        JMenuItem loadFileItem = new JMenuItem("Avaa tiedosto");
         JMenuItem saveFileItem = new JMenuItem("Tallenna");
         JMenuItem saveAsItem = new JMenuItem("Tallenna nimellä");
         JMenuItem quitItem = new JMenuItem("Lopeta");
+
+        newFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.CTRL_DOWN_MASK));
+        loadFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
+        saveFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.CTRL_DOWN_MASK));
 
         loadFileItem.addActionListener(new LoadFileListener());
         newFileItem.addActionListener(new NewFileListener());
@@ -157,6 +201,7 @@ public class MainWindow extends JFrame {
         quitItem.addActionListener(new QuitListener());
 
         JMenu file = new JMenu("Tiedosto");
+        file.setMnemonic('T');
         file.add(newFileItem);
         file.add(loadFileItem);
         file.add(saveFileItem);
@@ -164,9 +209,11 @@ public class MainWindow extends JFrame {
         file.addSeparator();
         file.add(quitItem);
 
-        JMenuItem helpItem = new JMenuItem("Ohje");
-        helpItem.addActionListener(new HelpMenuitemListener());
         JMenu helpBar = new JMenu("Ohje");
+        helpBar.setMnemonic('O');
+        JMenuItem helpItem = new JMenuItem("Ohje");
+        helpItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK));
+        helpItem.addActionListener(new HelpMenuitemListener());
         helpBar.add(helpItem);
 
         JMenuBar menuBar = new JMenuBar();
@@ -189,23 +236,12 @@ public class MainWindow extends JFrame {
     // Tämän metodin on heitettävä poikkeus, ettei kriittisissä tilanteissa
     // (Uusi tiedosto, lataa tiedosto jne) menetetä tietoja. Muut metodit
     // käsittelevät tämän heittämät poikkeukset.
-    private void saveFile() throws IOException {
+    private void saveFile() {
         if (control.getCurrentFile() == null) {
             saveAs();
         } else {
-            control.save();
-            message.setText("Tallennus onnistui");
-            message.setForeground(Color.black);
-        }
-    }
-
-    private void saveAs() {
-        File current = control.getCurrentFile();
-        JFileChooser chooser = new JFileChooser(current);
-        if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-            control.setCurrentFile(chooser.getSelectedFile());
             try {
-                saveFile();
+                control.save();
                 message.setText("Tallennus onnistui");
                 message.setForeground(Color.black);
             } catch (IOException ex) {
@@ -215,19 +251,29 @@ public class MainWindow extends JFrame {
         }
     }
 
+    private void saveAs() {
+        File current = control.getCurrentFile();
+        JFileChooser chooser = new JFileChooser(current);
+        if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            control.setCurrentFile(chooser.getSelectedFile());
+            saveFile();
+        }
+    }
+
     private void loadFile() {
         JFileChooser chooser = new JFileChooser();
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             try {
                 control.loadFile(chooser.getSelectedFile());
-            } catch (FileNotFoundException ex) {
+            } catch (Exception ex) {
                 message.setText("Lataus epäonnistui");
                 message.setForeground(Color.red);
+                repaint();
             }
         }
     }
-    
-    public void setMessage(String newMessage, boolean isWarning){
+
+    public void setMessage(String newMessage, boolean isWarning) {
         message.setText(newMessage);
         if (isWarning) {
             message.setForeground(Color.red);
@@ -275,7 +321,6 @@ public class MainWindow extends JFrame {
         tableModel.setDataVector(newData, fieldNames);
     }
 
-    
     private class LoadFileListener implements ActionListener {
 
         @Override
@@ -286,8 +331,8 @@ public class MainWindow extends JFrame {
                     loadFile();
                     message.setText("Tallennettu ja ladattu!");
                     message.setForeground(Color.black);
-                } catch (IOException ex) {
-                    message.setText("Tallennus epäonnistui. Uutta tiedostoa ei ole ladattu.");
+                } catch (Exception ex) {
+                    message.setText("Tallennus tai lataus epäonnistui. Uutta tiedostoa ei ole ladattu.");
                     message.setForeground(Color.red);
                 }
             }
@@ -300,14 +345,8 @@ public class MainWindow extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (control.needsToBeSaved() && saveFirstDialog()) {
-                try {
-                    saveFile();
-                    control.newFile();
-                    message.setText("Tallennus onnistui.");
-                    message.setForeground(Color.black);
-                } catch (IOException ex) {
-                    Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                saveFile();
+                control.newFile();
             }
         }
     }
@@ -316,11 +355,7 @@ public class MainWindow extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                saveFile();
-            } catch (IOException ex) {
-                Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            saveFile();
         }
     }
 
@@ -328,8 +363,8 @@ public class MainWindow extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-                saveAs();
-    }
+            saveAs();
+        }
     }
 
     private class QuitListener implements ActionListener {
@@ -337,13 +372,10 @@ public class MainWindow extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (control.needsToBeSaved() && saveFirstDialog()) {
-                try {
-                    saveFile();
-                } catch (IOException ex) {
-                    Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                saveFile();
+
+                System.exit(0);
             }
-            System.exit(0);
         }
     }
 
@@ -352,101 +384,111 @@ public class MainWindow extends JFrame {
         @Override
         public void windowClosing(WindowEvent winEvt) {
             if (control.needsToBeSaved() && saveFirstDialog()) {
-                try {
-                    saveFile();
-                } catch (IOException ex) {
-                    Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                saveFile();
             }
             System.exit(0);
         }
     }
 
-    private class NewCardListener implements ActionListener {
+        private class NewCardListener implements ActionListener {
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            newCard();
-        }
-    }
-
-    private class SearchListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            search();
-        }
-    }
-
-    private class ViewallListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            control.viewAll();
-        }
-    }
-
-    private class ViewcardListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (table.getSelectedRowCount() == 1) {
-                new CardView(fieldNames, control, tableModel, table.getSelectedRow());
-            }
-        }
-    }
-
-    private class EditcardListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (table.getSelectedRowCount() == 1) {
-                editCard();
-            }
-        }
-    }
-
-    private class CardDeleteListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (table.getSelectedRowCount() > 0) {
-                deleteCard();
-            }
-        }
-    }
-
-    private class HelpMenuitemListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            showManual();
-        }
-    }
-
-    private class TableClickListener implements MouseListener {
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            if (e.getClickCount() == 2) {
-                new CardView(fieldNames, control, tableModel, table.getSelectedRow());
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                newCard();
             }
         }
 
-        @Override
-        public void mousePressed(MouseEvent e) {
+        private class SearchListener implements ActionListener {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                search();
+            }
         }
 
-        @Override
-        public void mouseReleased(MouseEvent e) {
+        private class ViewallListener implements ActionListener {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                control.viewAll();
+            }
         }
 
-        @Override
-        public void mouseEntered(MouseEvent e) {
+        private class ViewcardListener implements ActionListener {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (table.getSelectedRowCount() == 1) {
+                    new CardView(fieldNames, control, tableModel, table.getSelectedRow());
+                }
+            }
         }
 
-        @Override
-        public void mouseExited(MouseEvent e) {
+        private class EditcardListener implements ActionListener {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (table.getSelectedRowCount() == 1) {
+                    editCard();
+                }
+            }
         }
-    }
+
+        private class CardDeleteListener implements ActionListener {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (table.getSelectedRowCount() > 0) {
+                    deleteCard();
+                }
+            }
+        }
+
+        private class HelpMenuitemListener implements ActionListener {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showManual();
+            }
+        }
+
+        private class TableClickListener implements MouseListener {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    new CardView(fieldNames, control, tableModel, table.getSelectedRow());
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+        }
+
+        private class QuickSearchListener implements ActionListener {
+
+            private JTextField searchField;
+
+            public QuickSearchListener(JTextField searchField) {
+                this.searchField = searchField;
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                control.searchAnyField(searchField.getText());
+            }
+        }
 }

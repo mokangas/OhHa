@@ -98,8 +98,18 @@ public class Control {
             mainWindow.setMessage("Kortit tuhottu", false);
         }
     }
-    
-    public int getNameFieldsNumber(){
+
+    public int getNameFieldsNumber() {
         return Card.TITLE;
+    }
+
+    public void searchAnyField(String searchWord) {
+        String[][] newData = register.searchAnyField(searchWord);
+        if (newData != null && newData.length > 0) {
+            mainWindow.setCardTableData(newData);
+            mainWindow.setMessage("Haun tulokset", false);
+        } else {
+            mainWindow.setMessage("Haku ei tuottanut tuloksia.", false);
+        }
     }
 }
