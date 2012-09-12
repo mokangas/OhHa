@@ -42,6 +42,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import Control.ExceptionsThrownByRegister;
+import java.awt.Color;
+import javax.swing.JLabel;
 
 /**
  *
@@ -53,6 +55,7 @@ public class MainWindow extends JFrame {
     private String[] fieldNames;
     private JTable table;
     private DefaultTableModel tableModel;
+    private JLabel message;
 
     public MainWindow(Control control, String[] fieldNames) {
 
@@ -68,7 +71,7 @@ public class MainWindow extends JFrame {
                 try {
                     UIManager.setLookAndFeel("Windows");
                 } catch (Exception e3) {
-                    // Use the default.
+                     //Uses the default.
                 }
             }
         }
@@ -82,6 +85,8 @@ public class MainWindow extends JFrame {
     }
 
     private void createComponents() {
+
+        message = new JLabel(" ");
 
         JButton newCardButton = new JButton("Lisää");
         JButton viewCardButton = new JButton("Näytä");
@@ -113,6 +118,7 @@ public class MainWindow extends JFrame {
         layout.setHorizontalGroup(
                 layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                .addComponent(message)
                 .addGroup(layout.createSequentialGroup()
                 .addComponent(newCardButton)
                 .addComponent(viewCardButton)
@@ -125,6 +131,7 @@ public class MainWindow extends JFrame {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
+                .addComponent(message)
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                 .addComponent(newCardButton)
                 .addComponent(viewCardButton)
@@ -171,7 +178,7 @@ public class MainWindow extends JFrame {
     private boolean saveFirstDialog() {
         Object[] options = {"Kyllä", "Ei"};
         int saveFirst = JOptionPane.showOptionDialog(this, "Kortisto on muuttunut, tallenna ensin?", ""
-                + "Tallenne tiedosto?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE,
+                + "Tallenna tiedosto?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE,
                 null, options, options[0]);
         if (saveFirst == JOptionPane.YES_OPTION) {
             return true;
@@ -179,27 +186,53 @@ public class MainWindow extends JFrame {
         return false;
     }
 
+    // Tämän metodin on heitettävä poikkeus, ettei kriittisissä tilanteissa
+    // (Uusi tiedosto, lataa tiedosto jne) menetetä tietoja. Muut metodit
+    // käsittelevät tämän heittämät poikkeukset.
     private void saveFile() throws IOException {
         if (control.getCurrentFile() == null) {
             saveAs();
         } else {
             control.save();
+            message.setText("Tallennus onnistui");
+            message.setForeground(Color.black);
         }
     }
 
-    private void saveAs() throws IOException {
+    private void saveAs() {
         File current = control.getCurrentFile();
         JFileChooser chooser = new JFileChooser(current);
         if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             control.setCurrentFile(chooser.getSelectedFile());
-            control.save();
+            try {
+                saveFile();
+                message.setText("Tallennus onnistui");
+                message.setForeground(Color.black);
+            } catch (IOException ex) {
+                message.setText("Tallennus epäonnistui");
+                message.setForeground(Color.red);
+            }
         }
     }
 
-    private void loadFile() throws FileNotFoundException {
+    private void loadFile() {
         JFileChooser chooser = new JFileChooser();
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            control.loadFile(chooser.getSelectedFile());
+            try {
+                control.loadFile(chooser.getSelectedFile());
+            } catch (FileNotFoundException ex) {
+                message.setText("Lataus epäonnistui");
+                message.setForeground(Color.red);
+            }
+        }
+    }
+    
+    public void setMessage(String newMessage, boolean isWarning){
+        message.setText(newMessage);
+        if (isWarning) {
+            message.setForeground(Color.red);
+        } else {
+            message.setForeground(Color.black);
         }
     }
 
@@ -214,18 +247,18 @@ public class MainWindow extends JFrame {
     private void showManual() {
         new Manual(this);
     }
-    
-    private void editCard(){
-            new CardEditDialog(this, fieldNames, control, tableModel, table.getSelectedRow());
+
+    private void editCard() {
+        new CardEditDialog(this, fieldNames, control, tableModel, table.getSelectedRow());
     }
-    
-    private void deleteCard(){
+
+    private void deleteCard() {
         // Asks for confirmation first
         String message = "Haluatko todella tuhota valitut kortit?";
         Object[] options = {"Kyllä", "Ei"};
-        int confirmation = JOptionPane.showOptionDialog(this, message, "Tuhoa kortit?", 
+        int confirmation = JOptionPane.showOptionDialog(this, message, "Tuhoa kortit?",
                 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
-        
+
         // If canceled, nothing will happen. If confirmed, this will happen:
         if (confirmation == JOptionPane.YES_OPTION) {
             String[][] deleted = new String[table.getSelectedRowCount()][fieldNames.length];
@@ -242,20 +275,23 @@ public class MainWindow extends JFrame {
         tableModel.setDataVector(newData, fieldNames);
     }
 
+    
     private class LoadFileListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                if (control.needsToBeSaved() && saveFirstDialog()) {
+            if (control.needsToBeSaved() && saveFirstDialog()) {
+                try {
                     saveFile();
+                    loadFile();
+                    message.setText("Tallennettu ja ladattu!");
+                    message.setForeground(Color.black);
+                } catch (IOException ex) {
+                    message.setText("Tallennus epäonnistui. Uutta tiedostoa ei ole ladattu.");
+                    message.setForeground(Color.red);
                 }
-                loadFile();
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                //Talennus ei onnistunut
             }
+            loadFile();
         }
     }
 
@@ -266,11 +302,13 @@ public class MainWindow extends JFrame {
             if (control.needsToBeSaved() && saveFirstDialog()) {
                 try {
                     saveFile();
+                    control.newFile();
+                    message.setText("Tallennus onnistui.");
+                    message.setForeground(Color.black);
                 } catch (IOException ex) {
                     Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            control.newFile();
         }
     }
 
@@ -290,12 +328,8 @@ public class MainWindow extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
                 saveAs();
-            } catch (IOException ex) {
-                Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+    }
     }
 
     private class QuitListener implements ActionListener {
@@ -332,7 +366,6 @@ public class MainWindow extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-//            new NewCardDialog(fieldNames, control);
             newCard();
         }
     }
@@ -358,12 +391,12 @@ public class MainWindow extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (table.getSelectedRowCount() == 1) {
-            new CardView(fieldNames, control, tableModel, table.getSelectedRow());
+                new CardView(fieldNames, control, tableModel, table.getSelectedRow());
             }
         }
     }
-    
-    private class EditcardListener implements ActionListener{
+
+    private class EditcardListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -371,18 +404,16 @@ public class MainWindow extends JFrame {
                 editCard();
             }
         }
-        
     }
-    
-    private class CardDeleteListener implements ActionListener{
+
+    private class CardDeleteListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (table.getSelectedRowCount() > 0 ){
-            deleteCard();
+            if (table.getSelectedRowCount() > 0) {
+                deleteCard();
             }
         }
-        
     }
 
     private class HelpMenuitemListener implements ActionListener {

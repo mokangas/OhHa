@@ -158,7 +158,7 @@ public class NewCardDialog extends JDialog {
                 message.setText("Jonkin kentän on sisällettävä tekstiä");
                 message.setForeground(Color.red);
             } catch (AlmostSameCardExistsException ex){
-                message.setText("Kortteja, joilla on sama nimeke ja tekijä ei voi lisätä.");
+                message.setText("Kortti, jolla on sama nimeke ja tekijä on jo olemassa!");
                 message.setForeground(Color.red);
             } catch (Exception ex){
             }

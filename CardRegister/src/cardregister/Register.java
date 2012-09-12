@@ -230,6 +230,9 @@ public class Register {
         return currentFile;
     }
     
+    // This method is not necessary for the functyionality of the program, but
+    // is retained for the possible future changes.
+    
     private Card findCard(String[] content){
         for (Card card :cards){
             if (card.contentEqualsTo(content)) {
@@ -239,14 +242,27 @@ public class Register {
         return null;
     }
     
-    public void editCard(String[] cardData, String[] newData){
-        // There should be exavtly one card that has the exact same data:
-        // It's prohibited to add two cards with the exact same
-        // content, and this method is not (should not be) 
-        // invoked when there's no card with the given data.
+    public void editCard(String[] cardData, String[] newData) 
+            throws ExceptionsThrownByRegister.AlmostSameCardExistsException {
+        // Addition of card relatively similar to an already existing card is 
+        // prohibited. It must be also prohibited to edit an existing card so that
+        // it will become too similar to some card. The criteria could be for example
+        // that two cards do not have the same author and title. It is explicitly
+        // defined in Card's isRelativelyEqualTo method.
         
+        // When editing a card we must first check if there already exists a card
+        // relatively similar to the edited card in which case the edit is not allowed.
+        // However, if the already existing card is the card that is edited, that is:
+        // the user edits a field by which the similarity isn't decided, the edit 
+        // must be allowed.
+        
+        String[][] similar = searchRelativelySimilarCardsData(newData);
+        if (similar == null || (findCard(similar[0]) == findCard(cardData))) { 
         findCard(cardData).setContent(newData);
         needSave = true;
+        } else {
+            throw new ExceptionsThrownByRegister.AlmostSameCardExistsException(similar);
+        }
     }
 
     public void deleteCards(String[][] toBeDeleted) {

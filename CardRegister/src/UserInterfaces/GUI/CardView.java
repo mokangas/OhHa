@@ -5,13 +5,19 @@
 package UserInterfaces.GUI;
 
 import Control.Control;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
@@ -49,7 +55,7 @@ public class CardView extends JFrame {
             }
         }
 
-        setTitle("");
+        setTitle((String) tableModel.getValueAt(row, control.getNameFieldsNumber()));
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         createComponents();
         pack();
@@ -63,15 +69,27 @@ public class CardView extends JFrame {
 
         JLabel[] labels = new JLabel[components];
         JLabel[] contents = new JLabel[components];
+
+
         for (int i = 0; i < components; i++) {
-            labels[i] = new JLabel(fieldNames[i]);
+            labels[i] = new JLabel(fieldNames[i] + ":");
             c.gridx = 0;
             c.gridy = i;
+            c.ipadx = 0;
+            c.weightx = 1;
+            c.anchor = GridBagConstraints.FIRST_LINE_START;
+            c.fill = GridBagConstraints.EAST;
+            c.insets = new Insets(10, 10, 0, 20);
             add(labels[i], c);
 
-            contents[i] = new JLabel((String) tableModel.getValueAt(row, i));
+            contents[i] = new JLabel("<html><body style='width: 200px'>"+
+                    (String) tableModel.getValueAt(row, i));
             c.gridx = 1;
             c.gridy = i;
+            c.ipadx = 0;
+            c.weightx = 1;
+            c.anchor = GridBagConstraints.FIRST_LINE_START;
+            c.fill = GridBagConstraints.EAST;
             add(contents[i], c);
         }
 
@@ -79,12 +97,14 @@ public class CardView extends JFrame {
         closeButton.addActionListener(new ClosebuttonListener());
         c.gridx = 0;
         c.gridy = components;
+        c.insets = new Insets(10, 10, 10, 20);
         add(closeButton, c);
 
         JButton editButton = new JButton("Muokkaa");
         editButton.addActionListener(new EditbuttonListener());
         c.gridx = 1;
         c.gridy = components;
+        c.insets = new Insets(10, 10, 10, 20);
         add(editButton, c);
 
     }
