@@ -46,10 +46,15 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseMotionAdapter;
 import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
+import javax.swing.ToolTipManager;
 
 /**
  *
@@ -83,6 +88,7 @@ public class MainWindow extends JFrame {
         }
 
         setTitle("Kortisto");
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new CloseListener());
         createComponents();
         createMenu();
@@ -109,8 +115,8 @@ public class MainWindow extends JFrame {
         searchButton.setMnemonic('a');
 
         newCardButton.addActionListener(new NewCardListener());
-        viewCardButton.addActionListener(new ViewcardListener());
-        editCardButton.addActionListener(new EditcardListener());
+        viewCardButton.addActionListener(new CardViewListener());
+        editCardButton.addActionListener(new CardEditListener());
         deleteButton.addActionListener(new CardDeleteListener());
         viewAllButton.addActionListener(new ViewallListener());
         searchButton.addActionListener(new SearchListener());
@@ -120,7 +126,8 @@ public class MainWindow extends JFrame {
         this.tableModel = new DataTableModel(null, fieldNames);
         this.table = new JTable(tableModel);
         table.setAutoCreateRowSorter(true);
-        table.addMouseListener(new TableClickListener());
+        table.addMouseListener(new TableEventListener());
+        table.addMouseMotionListener(new TableHoverListener());
         JScrollPane tableScrollPane = new JScrollPane(table);
 
         Container container = getContentPane();
@@ -190,9 +197,9 @@ public class MainWindow extends JFrame {
         JMenuItem saveAsItem = new JMenuItem("Tallenna nimellä");
         JMenuItem quitItem = new JMenuItem("Lopeta");
 
-        newFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.CTRL_DOWN_MASK));
-        loadFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
-        saveFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.CTRL_DOWN_MASK));
+        newFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
+        loadFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK));
+        saveFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
 
         loadFileItem.addActionListener(new LoadFileListener());
         newFileItem.addActionListener(new NewFileListener());
@@ -212,7 +219,7 @@ public class MainWindow extends JFrame {
         JMenu helpBar = new JMenu("Ohje");
         helpBar.setMnemonic('O');
         JMenuItem helpItem = new JMenuItem("Ohje");
-        helpItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK));
+        helpItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_DOWN_MASK));
         helpItem.addActionListener(new HelpMenuitemListener());
         helpBar.add(helpItem);
 
@@ -222,15 +229,16 @@ public class MainWindow extends JFrame {
         setJMenuBar(menuBar);
     }
 
-    private boolean saveFirstDialog() {
-        Object[] options = {"Kyllä", "Ei"};
+    /**
+     *
+     * @return corresponding JOptionPane integer
+     */
+    private int saveFirstDialog() {
+        Object[] options = {"Kyllä", "Ei", "peruuta"};
         int saveFirst = JOptionPane.showOptionDialog(this, "Kortisto on muuttunut, tallenna ensin?", ""
-                + "Tallenna tiedosto?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE,
+                + "Tallenna tiedosto?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,
                 null, options, options[0]);
-        if (saveFirst == JOptionPane.YES_OPTION) {
-            return true;
-        }
-        return false;
+        return saveFirst;
     }
 
     // Tämän metodin on heitettävä poikkeus, ettei kriittisissä tilanteissa
@@ -325,7 +333,13 @@ public class MainWindow extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (control.needsToBeSaved() && saveFirstDialog()) {
+            if (!control.needsToBeSaved()) {
+                loadFile();
+                return;
+            }
+
+            int option = saveFirstDialog();
+            if (option == JOptionPane.YES_OPTION) {
                 try {
                     saveFile();
                     loadFile();
@@ -335,8 +349,10 @@ public class MainWindow extends JFrame {
                     message.setText("Tallennus tai lataus epäonnistui. Uutta tiedostoa ei ole ladattu.");
                     message.setForeground(Color.red);
                 }
+            } else if (option == JOptionPane.NO_OPTION) {
+                loadFile();
             }
-            loadFile();
+
         }
     }
 
@@ -344,8 +360,17 @@ public class MainWindow extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (control.needsToBeSaved() && saveFirstDialog()) {
+
+            if (!control.needsToBeSaved()) {
+                control.newFile();
+                return;
+            }
+
+            int option = saveFirstDialog();
+            if (option == JOptionPane.YES_OPTION) {
                 saveFile();
+                control.newFile();
+            } else if (option == JOptionPane.NO_OPTION) {
                 control.newFile();
             }
         }
@@ -371,9 +396,15 @@ public class MainWindow extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (control.needsToBeSaved() && saveFirstDialog()) {
-                saveFile();
+            if (!control.needsToBeSaved()) {
+                System.exit(0);
+            }
 
+            int option = saveFirstDialog();
+            if (option == JOptionPane.YES_OPTION) {
+                saveFile();
+                System.exit(0);
+            } else if (option == JOptionPane.NO_OPTION) {
                 System.exit(0);
             }
         }
@@ -383,112 +414,166 @@ public class MainWindow extends JFrame {
 
         @Override
         public void windowClosing(WindowEvent winEvt) {
-            if (control.needsToBeSaved() && saveFirstDialog()) {
-                saveFile();
+            if (!control.needsToBeSaved()) {
+                System.exit(0);
             }
-            System.exit(0);
+
+            int option = saveFirstDialog();
+
+            if (option == JOptionPane.YES_OPTION) {
+                saveFile();
+                System.exit(0);
+            } else if (option == JOptionPane.NO_OPTION) {
+                System.exit(0);
+            }
         }
     }
 
-        private class NewCardListener implements ActionListener {
+    private class NewCardListener implements ActionListener {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                newCard();
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            newCard();
+        }
+    }
+
+    private class SearchListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            search();
+        }
+    }
+
+    private class ViewallListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            control.viewAll();
+        }
+    }
+
+    private class CardViewListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (table.getSelectedRowCount() == 1) {
+                new CardView(fieldNames, control, tableModel, table.getSelectedRow());
+            }
+        }
+    }
+
+    private class CardEditListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (table.getSelectedRowCount() == 1) {
+                editCard();
+            }
+        }
+    }
+
+    private class CardDeleteListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (table.getSelectedRowCount() > 0) {
+                deleteCard();
+            }
+        }
+    }
+
+    private class HelpMenuitemListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            showManual();
+        }
+    }
+
+    private class TableEventListener implements MouseListener {
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.getClickCount() == 2) {
+                new CardView(fieldNames, control, tableModel, table.getSelectedRow());
             }
         }
 
-        private class SearchListener implements ActionListener {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                search();
+        @Override
+        public void mousePressed(MouseEvent e) {
+            if (e.getButton() == MouseEvent.BUTTON3) {
+                ContextMenu cMenu = new ContextMenu(e);
+                cMenu.show(table, e.getX(), e.getY());
             }
         }
 
-        private class ViewallListener implements ActionListener {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                control.viewAll();
-            }
+        @Override
+        public void mouseReleased(MouseEvent e) {
         }
 
-        private class ViewcardListener implements ActionListener {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (table.getSelectedRowCount() == 1) {
-                    new CardView(fieldNames, control, tableModel, table.getSelectedRow());
-                }
-            }
+        @Override
+        public void mouseEntered(MouseEvent e) {
         }
 
-        private class EditcardListener implements ActionListener {
+        @Override
+        public void mouseExited(MouseEvent e) {
+        }
+    }
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (table.getSelectedRowCount() == 1) {
-                    editCard();
-                }
+    private class TableHoverListener extends MouseMotionAdapter {
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+
+            int rowPointed = table.rowAtPoint(e.getPoint());
+            String toolTip = "<html>";
+            for (int i = 0; i < fieldNames.length; i++) {
+                toolTip = toolTip + tableModel.getValueAt(rowPointed, i) + "<br/>";
             }
+
+            ToolTipManager.sharedInstance().setInitialDelay(300);
+            table.setToolTipText(toolTip);
+
+        }
+    }
+
+    private class ContextMenu extends JPopupMenu {
+
+        public ContextMenu(MouseEvent e) {
+
+            // If the clicked row isn't seleceted, it will be set as the single
+            // selected row.
+
+            int clickedRow = table.rowAtPoint(e.getPoint());
+            ListSelectionModel selModel = table.getSelectionModel();
+            if (!selModel.isSelectedIndex(clickedRow)) {
+                selModel.clearSelection();
+                selModel.addSelectionInterval(clickedRow, clickedRow);
+            }
+
+            // After that the context menu appears:
+
+            JMenuItem show = add(new JMenuItem("Näytä"));
+            JMenuItem edit = add(new JMenuItem("Muokkaa"));
+            JMenuItem delete = add(new JMenuItem("Tuhoa"));
+            show.addActionListener(new CardViewListener());
+            edit.addActionListener(new CardEditListener());
+            delete.addActionListener(new CardDeleteListener());
+        }
+    }
+
+    private class QuickSearchListener implements ActionListener {
+
+        private JTextField searchField;
+
+        public QuickSearchListener(JTextField searchField) {
+            this.searchField = searchField;
         }
 
-        private class CardDeleteListener implements ActionListener {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (table.getSelectedRowCount() > 0) {
-                    deleteCard();
-                }
-            }
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            control.searchAnyField(searchField.getText());
         }
-
-        private class HelpMenuitemListener implements ActionListener {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showManual();
-            }
-        }
-
-        private class TableClickListener implements MouseListener {
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    new CardView(fieldNames, control, tableModel, table.getSelectedRow());
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-            }
-        }
-
-        private class QuickSearchListener implements ActionListener {
-
-            private JTextField searchField;
-
-            public QuickSearchListener(JTextField searchField) {
-                this.searchField = searchField;
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                control.searchAnyField(searchField.getText());
-            }
-        }
+    }
 }
