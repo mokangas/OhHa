@@ -4,10 +4,17 @@
  */
 package UserInterfaces.GUI;
 
+import java.awt.Dimension;
+import java.io.InputStream;
+import java.util.Scanner;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.WindowConstants;
+import sun.applet.Main;
 
 /**
  *
@@ -21,15 +28,21 @@ public class Manual extends JDialog {
         setTitle("Ohje");
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         createComponents();
+        setPreferredSize(new Dimension(500,500));
         pack();
         setVisible(true);
     }
 
     private void createComponents() {
-        JTextArea textArea = new JTextArea("werjhewrkjhasfj,h\nkjhgsadfjhgasdfjgh"
-                + "\nasdfkjhgasdfjgh\nmasdfkhgsdfkjghasdf\nsdflasdfkhjasdfklh\nsdfsdfhsdfhkl");
-        textArea.setEditable(false);
-        add(textArea);
+        
+        InputStream help = Manual.class.getClassLoader().getResourceAsStream("help.html");
+        Scanner scanner = new Scanner(help);
+        scanner.useDelimiter("\\Z");
+        String content = scanner.next();
+        
+        JLabel textContainer = new JLabel(content);
+        JScrollPane scrollP = new JScrollPane(textContainer);
+        add(scrollP);
     }
     
 }

@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -26,15 +27,18 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author IstuvaHarka
  */
-public class CardView extends JFrame {
+public class CardView extends JDialog {
 
     private String[] fieldNames;
     private Control control;
     private int components;
     private DefaultTableModel tableModel;
     private int row;
+    private JFrame owner;
 
-    public CardView(String[] fieldNames, Control control, DefaultTableModel tableModel, int row) {
+    public CardView(JFrame owner, String[] fieldNames, Control control, DefaultTableModel tableModel, int row) {
+        super(owner);
+        this.owner = owner;
         this.fieldNames = fieldNames;
         this.components = fieldNames.length;
         this.control = control;
@@ -113,7 +117,7 @@ public class CardView extends JFrame {
 
     private void editCard() {
         dispose();
-        new CardEditDialog(this, fieldNames, control, tableModel, row);
+        new CardEditDialog(owner, fieldNames, control, tableModel, row);
     }
 
     private class ClosebuttonListener implements ActionListener {

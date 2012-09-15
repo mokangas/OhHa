@@ -98,7 +98,7 @@ public class MainWindow extends JFrame {
 
     private void createComponents() {
 
-        message = new JLabel(" ");
+        message = new JLabel("Tervetuloa. Paina CTRL + H lukeaksesi ohjeen.");
 
         JButton newCardButton = new JButton("Lisää");
         JButton viewCardButton = new JButton("Näytä");
@@ -306,6 +306,10 @@ public class MainWindow extends JFrame {
         new CardEditDialog(this, fieldNames, control, tableModel, table.getSelectedRow());
     }
 
+    private void viewCard() {
+        new CardView(this, fieldNames, control, tableModel, table.getSelectedRow());
+    }
+
     private void deleteCard() {
         // Asks for confirmation first
         String message = "Haluatko todella tuhota valitut kortit?";
@@ -458,7 +462,7 @@ public class MainWindow extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (table.getSelectedRowCount() == 1) {
-                new CardView(fieldNames, control, tableModel, table.getSelectedRow());
+                viewCard();
             }
         }
     }
@@ -496,7 +500,7 @@ public class MainWindow extends JFrame {
         @Override
         public void mouseClicked(MouseEvent e) {
             if (e.getClickCount() == 2) {
-                new CardView(fieldNames, control, tableModel, table.getSelectedRow());
+                viewCard();
             }
         }
 
