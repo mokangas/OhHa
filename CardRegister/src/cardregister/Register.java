@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -88,6 +89,9 @@ public class Register implements CardRegister {
         }
         for (int i = 0; i < toBeDeleted.length; i++) {
             Card card = findCard(toBeDeleted[i]);
+            if (card == null) {
+                return;
+            }
             cards.remove(card);
         }
         needSave = true;
@@ -157,7 +161,9 @@ public class Register implements CardRegister {
      * @return The card with the given content.
      */
     private Card findCard(String[] content) {
-        for (Card card : cards) {
+        Iterator<Card> iterator = cards.iterator();
+        while (iterator.hasNext()) {
+            Card card = iterator.next();
             if (card.contentEqualsTo(content)) {
                 return card;
             }

@@ -124,9 +124,13 @@ public class RegisterTest {
     @Test
     public void addingEmptyCardData() {
         String[] empty = new String[register.getFieldNames().length];
+        for (int i = 0; i < empty.length ; i++) {
+            empty[i] = "";
+        }
+        
         try {
             register.createCard(empty);
-            fail(); // This should thwor an exception.
+            fail(); // This should throw an exception.
         } catch (Exception ex) {
             NullInputException e = new NullInputException();
             assertTrue(ex.getClass() == e.getClass());
@@ -169,17 +173,15 @@ public class RegisterTest {
         // same method.
         
         // Initialaize:
-        String[][] inputData = new String[cardData.length-1][cardData.length];
-        for (int i = 0; i < cardData.length-1; i++) {
-            for (int j = i; j < cardData.length; j++) {
-                inputData[i][j] = cardData[j-i];
-                // To prevent the AlmostSameCardException and to indetify
-                // cards easily later:
-                inputData[i][0] = "input" + i; 
+        String[][] inputData = new String[10][cardData.length];
+        for (int i = 0; i < 10; i++) {
+            inputData[i][0] = "input" + i; 
+            for (int j = 1; j < cardData.length; j++) {
+                 inputData[i][j] = cardData[j];
             }
         }
         
-        for (int i = 0; i < inputData.length; i++) {
+        for (int i = 0; i < 10; i++) {
             try {
                 register.createCard(inputData[i]);
             } catch (Exception ex) {
@@ -189,23 +191,23 @@ public class RegisterTest {
         
         // Delete two cards:
         String[][] del = new String[2][cardData.length];
-        del[0] = inputData[inputData.length/3];
-        del[1] = inputData[inputData.length/2];
+        del[0] = inputData[2];
+        del[1] = inputData[5];
         register.deleteCards(del);
         
         // Two cards have been deleted:
-        assertEquals(inputData.length - 2, register.getCardData().length);
+        assertEquals(8, register.getCardData().length);
         
         // The cards deleted are the right ones.
         boolean containsFirst = false;
         boolean containsSecond = false;
         
         String[][] retrievedData = register.getCardData();
-        for (int i = 0; i < retrievedData.length; i++) {
-            if (retrievedData[i][0].trim().equalsIgnoreCase(del[0][0].trim())) {
+        for (int i = 0; i < 8; i++) {
+            if (retrievedData[i][0].equals(del[0][0])) {
                 containsFirst = true;
             }
-            if (retrievedData[i][0].trim().equalsIgnoreCase(del[1][0].trim())) {
+            if (retrievedData[i][0].equals(del[1][0])) {
                 containsSecond = true;
             }
         }
@@ -217,12 +219,11 @@ public class RegisterTest {
     @Test
     public void isntChangedWhenCreated() {
         try {
-            register.createCard(cardData);
+            Register register2 = new Register();
+        assertFalse(register2.needsToBeSaved());
         } catch (Exception ex) {
             fail();
         }
-        
-        assertFalse(register.needsToBeSaved());
     }
 
     @Test

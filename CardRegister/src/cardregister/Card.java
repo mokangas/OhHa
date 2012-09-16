@@ -57,8 +57,16 @@ public class Card {
      * @param textFields The content of the card to be created.
      */
     public Card(String[] textFields) {
+        // Null input is empty card:
         if (textFields == null) {
             textFields = new String[NUMBER_OF_FIELDS];
+        }
+        
+        // No null fields allowed:
+        for (int i = 0; i < textFields.length; i++) {
+            if (textFields[i] == null) {
+                textFields[i] = "";
+            }
         }
         content = new String[NUMBER_OF_FIELDS];
         int min = Math.min(NUMBER_OF_FIELDS, textFields.length);
@@ -78,7 +86,12 @@ public class Card {
      */
     public boolean contentEqualsTo(String[] text) {
         for (int i = 0; i < NUMBER_OF_FIELDS; i++) {
-            if (!content[i].trim().toLowerCase().equals(text[i].trim().toLowerCase())) {
+            boolean contentNull = ( content[i] == null ) || ( text[i] == null);
+            if (contentNull) {
+                return false;
+            }
+            boolean contentNotSame = !content[i].trim().toLowerCase().equals(text[i].trim().toLowerCase());
+            if (contentNotSame) {
                 return false;
             }
         }
