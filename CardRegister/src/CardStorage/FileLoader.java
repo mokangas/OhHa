@@ -7,15 +7,12 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * This Class is used to load files into the register.
- * This is different from <code>TextFileLoader</code> in allowing the text
- * fields to have multiple lines. The String <code>">#>#>#:::"</code> can't however be
- * present in any field.
+ * This Class is used to load files into the register. The String 
+ * <code>">#>#>#:::"</code> can't be present in any field, since it is used to
+ * separate fields from the others. If the amount of fields in the file is not 
+ * divisible by <vode>numberOfFields</code>, the last extra fields will just be
+ * omitted.
  * 
- * This can load only files saved by FileLoader and the same way TextFileLoader
- * reads only files saved by TextFileSaver.
- * 
- * @see TextFileLoader
  * @see FileSaver
  * @author mokangas
  */

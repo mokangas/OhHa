@@ -353,20 +353,6 @@ public class Register implements CardRegister {
     }
 
     /**
-     * Sorts the cards according to the alphabetical order (case ignored) of the
-     * field specified by the argument. It's wise to use one of this class's
-     * static variables as a parameter.
-     *
-     * @deprecated This method is practical for consol interfaces, but has
-     * no use in any relatively reasonable GUI.
-     * @param field The index of the field by which the register will be sorted.
-     */
-    public void sortBy(int field) {
-        CardComparator comparator = new CardComparator(field);
-        Collections.sort(cards, comparator);
-    }
-
-    /**
      * Converts the data of a card list to a one without a predefined structure.
      * This is used to communicate with other packages which don't have to know
      * about the structure of class <code>Card</code>. In the returned array first

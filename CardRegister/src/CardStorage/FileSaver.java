@@ -6,10 +6,10 @@ import java.io.IOException;
 
 /**
  * This class is used to save register to a file. The save format is legible to
- * <code>FileLoader</code>, but not to
- * <code>TextFileLoader</code>. This allows multiple lines in a text field of a
- * card, but not the a substring
- * <code>">#>#>#:::"</code>.
+ * <code>FileLoader</code>. This class uses the string <code>">#>#>#:::"</code>
+ * to separate information fields from each other. Different cards aren't
+ * separated by any other thing than the number of fields. That is: even empty
+ * content is written to the file.
  *
  * @see FileLoader
  * @author mokangas
