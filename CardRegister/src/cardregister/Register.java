@@ -45,7 +45,7 @@ public class Register implements CardRegister {
      * @throws Control.CardRegisterExceptions.AlmostSameCardExistsException if
      * there already is a card which is almost the same by the standards of
      * @see CardRegister.Card#isRelativelyEqualTo method.
-     * @throws CardAlreadyExistsException never.
+     * @throws CardAlreadyExistsException Never.
      */
     @Override
     public void createCard(String[] content) throws NullInputException,

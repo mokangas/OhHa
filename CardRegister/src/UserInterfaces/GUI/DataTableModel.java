@@ -10,6 +10,11 @@ import javax.swing.table.DefaultTableModel;
  */
 public class DataTableModel extends DefaultTableModel {
 
+    /**
+     * Constructor.
+     * @param data The data to be displayed on the table.
+     * @param columnNames Column names.
+     */
     public DataTableModel(Object[][] data, String[] columnNames) {
         super(data, columnNames);
     }

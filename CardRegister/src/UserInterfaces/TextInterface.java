@@ -6,6 +6,7 @@
 //
 //import cardregister.Card;
 //import cardregister.Register;
+//import java.io.File;
 //import java.io.FileNotFoundException;
 //import java.io.IOException;
 //import java.util.ArrayList;
@@ -177,45 +178,46 @@
 //            System.out.println("Ei avointa tiedostoa.");
 //            return;
 //        }
-//        String file = register.getFileName();
+//        String file = register.getCurrentFile().getName();
 //        System.out.println("Tämänhetkinen tiedoston nimi on \"" + file + "\". Anna"
 //                + "uusi nimi tai paina ENTER tallentaaksesi vanhalla.\n>");
-////        try {
-////            String newName = input();
-////            switch (newName) {
-////                case "":
-////                    register.save(file);
-////                    return;
-////                default:
-////                    register.save(newName);
-////            }
-////        } catch (IOException ex) {
-////            System.out.println("Jokin meni vikaan. Tarkista tiedoston nimi.");
-////        }
+//        try {
+//            String newName = input();
+//            switch (newName) {
+//                case "":
+//                    register.setCurrentFile(new File(newName));
+//                    register.save();
+//                    return;
+//                default:
+//                    register.save();
+//            }
+//        } catch (IOException ex) {
+//            System.out.println("Jokin meni vikaan. Tarkista tiedoston nimi.");
+//        }
 //    }
 //
 //    /**
 //     * Lets the user browse register, and select and deselect cards from it.
 //     */
-////    private void browseRegister() {
-////        if (register == null) {
-////            System.out.println("Ei avointa kortistoa.\n");
-////        }
-////        viewList(register.getCards());
-////    }
+//    private void browseRegister() {
+//        if (register == null) {
+//            System.out.println("Ei avointa kortistoa.\n");
+//        }
+//        viewList(register.getCardData());
+//    }
 //
 //    /**
-//     * Shows user a list of cards (the whole register or part of it), and allows
+//     * Shows user a list of cardData (the whole register or part of it), and allows
 //     * him to select some of them.
 //     *
-//     * @param cards the cards to be shown.
+//     * @param cardData the cardData to be shown.
 //     */
-//    private void viewList(List<Card> cards) {
-//        if (cards == null) {
+//    private void viewList(String[][] cardData) {
+//        if (cardData == null) {
 //            return;
 //        }
-//        int pages = cards.size() / NO_OF_CARDS_ON_PAGE;
-//        int onLastPage = cards.size() % NO_OF_CARDS_ON_PAGE;
+//        int pages = cardData.length / NO_OF_CARDS_ON_PAGE;
+//        int onLastPage = cardData.length % NO_OF_CARDS_ON_PAGE;
 //        // If onLastPage == 0, the "last page" won't be viewed.
 //        for (int page = 0; page <= pages; page++) {
 //            int print = (page == pages) ? onLastPage : NO_OF_CARDS_ON_PAGE;
@@ -225,10 +227,12 @@
 //                // Card numbering shown to the user starts from the index 1.
 //                System.out.println("Kortti #" + (cardNumber + 1));
 //                System.out.println("------");
-//                cards.get(cardNumber).print();
+//                for (int i = 0; i < Card.getLabels().length; i++) {
+//                    System.out.println(cardData[cardNumber][i]);
+//                }
 //            }
 //            System.out.println("-----------------");
-//            selectFromList(cards, page * NO_OF_CARDS_ON_PAGE, (page + 1) * NO_OF_CARDS_ON_PAGE);
+//            selectFromList(cardData, page * NO_OF_CARDS_ON_PAGE, (page + 1) * NO_OF_CARDS_ON_PAGE);
 //        }
 //    }
 //
