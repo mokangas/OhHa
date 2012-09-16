@@ -1,36 +1,27 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package UserInterfaces.GUI;
 
 import Control.Control;
-import Control.ExceptionsThrownByRegister;
-import Control.ExceptionsThrownByRegister.AlmostSameCardExistsException;
-import Control.ExceptionsThrownByRegister.NullInputException;
+import cardregister.CardRegisterExceptions.AlmostSameCardExistsException;
+import cardregister.CardRegisterExceptions.NullInputException;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
-import javax.swing.table.DefaultTableModel;
 
 /**
  *
- * @author IstuvaHarka
+ * A dialog for adding new cards to the register.
+ *
+ * @author mokangad
  */
 public class NewCardDialog extends JDialog {
 
@@ -41,6 +32,14 @@ public class NewCardDialog extends JDialog {
     private Control control;
     private JLabel message;
 
+    /**
+     * The constructor.
+     *
+     * @param owner The frame which causes this dialog to pop up.
+     * @param fieldNames The names of the card's content fields.
+     * @param control The <code>Control</code>-object linking GUI
+     * to <code>CardRegister</code>.
+     */
     public NewCardDialog(JFrame owner, String[] fieldNames, Control control) {
 
         super(owner);
@@ -71,6 +70,9 @@ public class NewCardDialog extends JDialog {
         setVisible(true);
     }
 
+    /**
+     * Creates the components to this dialog.
+     */
     private void createComponents() {
         JLabel[] texts = new JLabel[components];
         textFields = new JTextField[components - 1];
@@ -78,7 +80,7 @@ public class NewCardDialog extends JDialog {
         GridBagLayout layout = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
         setLayout(layout);
-        
+
         message = new JLabel(" ");
         c.gridx = 1;
         c.gridy = 0;
@@ -87,7 +89,7 @@ public class NewCardDialog extends JDialog {
         for (int i = 0; i < components - 1; i++) {
             texts[i] = new JLabel(fieldNames[i]);
             c.gridx = 0;
-            c.gridy = i+1;
+            c.gridy = i + 1;
             c.ipadx = 0;
             c.weightx = 1;
             c.anchor = GridBagConstraints.FIRST_LINE_END;
@@ -95,7 +97,7 @@ public class NewCardDialog extends JDialog {
             add(texts[i], c);
             textFields[i] = new JTextField(30);
             c.gridx = 1;
-            c.gridy = i+1;
+            c.gridy = i + 1;
             c.ipadx = 120;
             c.weightx = 6;
             c.anchor = GridBagConstraints.FIRST_LINE_START;
@@ -144,8 +146,33 @@ public class NewCardDialog extends JDialog {
         add(cancel, c);
     }
 
+    /**
+     * Listener for the cancel button.
+     */
+    private class CancelListener implements ActionListener {
+
+        /**
+         * Disposes the window when "cancel" is clicked.
+         *
+         * @param e The event launching this process.
+         */
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            dispose();
+        }
+    }
+
+    /**
+     * Listener for the "New Card"-button.
+     */
     private class NewCardListener implements ActionListener {
 
+        /**
+         * Sends the content typed by the user to control to be added to the
+         * register.
+         *
+         * @param e The event launching this process.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             String[] content = new String[components];
@@ -159,19 +186,11 @@ public class NewCardDialog extends JDialog {
             } catch (NullInputException ex) {
                 message.setText("Jonkin kentän on sisällettävä tekstiä");
                 message.setForeground(Color.red);
-            } catch (AlmostSameCardExistsException ex){
+            } catch (AlmostSameCardExistsException ex) {
                 message.setText("Kortti, jolla on sama nimeke ja tekijä on jo olemassa!");
                 message.setForeground(Color.red);
-            } catch (Exception ex){
+            } catch (Exception ex) {
             }
-        }
-    }
-
-    private class CancelListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            dispose();
         }
     }
 }

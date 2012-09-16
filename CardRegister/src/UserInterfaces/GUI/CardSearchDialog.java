@@ -1,41 +1,42 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package UserInterfaces.GUI;
 
 import Control.Control;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 /**
  *
- * @author IstuvaHarka
+ * The dialog for more detailed search from the register.
+ *
+ * @author mokangas
  */
 public class CardSearchDialog extends JDialog {
 
     private String[] fieldNames;
     private JTextField[] textFields;
-    private int components;
+    private int fields;
     private Control control;
 
+    /**
+     * Constructor.
+     *
+     * @param owner The frame which launches this dialog.
+     * @param fieldNames The names of the card's data fields.
+     * @param control The <code>COntrol</code> object attached to this GUI.
+     */
     public CardSearchDialog(JFrame owner, String[] fieldNames, Control control) {
         super(owner);
         this.fieldNames = fieldNames;
-        this.components = fieldNames.length;
+        this.fields = fieldNames.length;
         this.control = control;
 
         try {
@@ -59,9 +60,12 @@ public class CardSearchDialog extends JDialog {
         setVisible(true);
     }
 
+    /**
+     * Creates the components for this window.
+     */
     private void createComponents() {
-        JLabel[] texts = new JLabel[components];
-        textFields = new JTextField[components];
+        JLabel[] texts = new JLabel[fields];
+        textFields = new JTextField[fields];
 
         GridBagLayout layout = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
@@ -78,7 +82,7 @@ public class CardSearchDialog extends JDialog {
         add(new JLabel("Hakusana"));
 
 
-        for (int i = 0; i < components; i++) {
+        for (int i = 0; i < fields; i++) {
             texts[i] = new JLabel(fieldNames[i]);
             c.gridx = 0;
             c.gridy = i + 1;
@@ -96,39 +100,53 @@ public class CardSearchDialog extends JDialog {
         search.setMnemonic('H');
         search.addActionListener(new SearchbuttonListener());
         c.gridx = 0;
-        c.gridy = components + 1;
+        c.gridy = fields + 1;
         c.ipadx = 2;
         add(search, c);
-        
+
         JButton cancel = new JButton("Peruuta");
         cancel.setMnemonic('P');
         cancel.addActionListener(new CancelButtonListener());
         c.gridx = 1;
-        c.gridy = components + 1;
+        c.gridy = fields + 1;
         c.ipadx = 2;
         add(cancel, c);
     }
-    
-    private class SearchbuttonListener implements ActionListener{
 
+    /**
+     * A listener for the search-button.
+     */
+    private class SearchbuttonListener implements ActionListener {
+
+        /**
+         * Passes the search words to the control and disposes this window.
+         *
+         * @param e The event that launches this process.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
-            String[] searchWords = new String[components];
-            for (int i = 0; i < components; i++) {
+            String[] searchWords = new String[fields];
+            for (int i = 0; i < fields; i++) {
                 searchWords[i] = textFields[i].getText();
             }
             control.search(searchWords);
             dispose();
         }
-    
-}
-    
+    }
+
+    /**
+     * A listener for the cancel button.
+     */
     private class CancelButtonListener implements ActionListener {
 
+        /**
+         * Disposes this window.
+         *
+         * @param e The event that launches this process.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             dispose();
         }
-        
     }
 }

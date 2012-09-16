@@ -1,64 +1,43 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package UserInterfaces.GUI;
 
 import Control.Control;
+import java.awt.Color;
 import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.LayoutStyle;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.WindowConstants;
-import javax.swing.event.TableModelEvent;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import Control.ExceptionsThrownByRegister;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridLayout;
-import java.awt.Point;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseMotionAdapter;
-import javax.swing.JLabel;
-import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
 import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
+import javax.swing.table.DefaultTableModel;
 
 /**
+ * This is the main window of the GUI.
  *
- * @author IstuvaHarka
+ * @author mokangas
  */
 public class MainWindow extends JFrame {
 
@@ -68,11 +47,19 @@ public class MainWindow extends JFrame {
     private DefaultTableModel tableModel;
     private JLabel message;
 
+    /**
+     * The sole constructor.
+     *
+     * @param control the <code>Control</code>-object this window is attached
+     * to, and through which the UI uses the register.
+     * @param fieldNames Names of the content fields of a card.
+     */
     public MainWindow(Control control, String[] fieldNames) {
 
         this.control = control;
         this.fieldNames = fieldNames;
 
+        // Tries to set look and feel:
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
         } catch (Exception e) {
@@ -96,6 +83,9 @@ public class MainWindow extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * Creates the components for the main window.
+     */
     private void createComponents() {
 
         message = new JLabel("Tervetuloa. Paina CTRL + H lukeaksesi ohjeen.");
@@ -165,30 +155,9 @@ public class MainWindow extends JFrame {
                 .addComponent(tableScrollPane));
     }
 
-    private JPanel createSearchPanel() {
-        JPanel searchPanel = new JPanel();
-        GroupLayout layout = new GroupLayout(searchPanel);
-        searchPanel.setLayout(layout);
-
-        JTextField quickSearchField = new JTextField(10);
-        JButton quickSearchButton = new JButton("Hae");
-        quickSearchButton.setMnemonic('H');
-        quickSearchButton.addActionListener(new QuickSearchListener(quickSearchField));
-
-        layout.setHorizontalGroup(
-                layout.createSequentialGroup()
-                .addComponent(quickSearchField)
-                .addComponent(quickSearchButton));
-
-        layout.setVerticalGroup(
-                layout.createParallelGroup()
-                .addComponent(quickSearchField, GroupLayout.PREFERRED_SIZE,
-                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addComponent(quickSearchButton));
-
-        return searchPanel;
-    }
-
+    /**
+     * Creates the menu bar for the main window.
+     */
     private void createMenu() {
 
         JMenuItem newFileItem = new JMenuItem("Uusi tiedosto");
@@ -230,86 +199,38 @@ public class MainWindow extends JFrame {
     }
 
     /**
+     * Creates and returns the search panel for the main window.
      *
-     * @return corresponding JOptionPane integer
+     * @return The search panel.
      */
-    private int saveFirstDialog() {
-        Object[] options = {"Kyllä", "Ei", "peruuta"};
-        int saveFirst = JOptionPane.showOptionDialog(this, "Kortisto on muuttunut, tallenna ensin?", ""
-                + "Tallenna tiedosto?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,
-                null, options, options[0]);
-        return saveFirst;
+    private JPanel createSearchPanel() {
+        JPanel searchPanel = new JPanel();
+        GroupLayout layout = new GroupLayout(searchPanel);
+        searchPanel.setLayout(layout);
+
+        JTextField quickSearchField = new JTextField(10);
+        JButton quickSearchButton = new JButton("Hae");
+        quickSearchButton.setMnemonic('H');
+        quickSearchButton.addActionListener(new QuickSearchListener(quickSearchField));
+
+        layout.setHorizontalGroup(
+                layout.createSequentialGroup()
+                .addComponent(quickSearchField)
+                .addComponent(quickSearchButton));
+
+        layout.setVerticalGroup(
+                layout.createParallelGroup()
+                .addComponent(quickSearchField, GroupLayout.PREFERRED_SIZE,
+                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(quickSearchButton));
+
+        return searchPanel;
     }
 
-    // Tämän metodin on heitettävä poikkeus, ettei kriittisissä tilanteissa
-    // (Uusi tiedosto, lataa tiedosto jne) menetetä tietoja. Muut metodit
-    // käsittelevät tämän heittämät poikkeukset.
-    private void saveFile() {
-        if (control.getCurrentFile() == null) {
-            saveAs();
-        } else {
-            try {
-                control.save();
-                message.setText("Tallennus onnistui");
-                message.setForeground(Color.black);
-            } catch (IOException ex) {
-                message.setText("Tallennus epäonnistui");
-                message.setForeground(Color.red);
-            }
-        }
-    }
-
-    private void saveAs() {
-        File current = control.getCurrentFile();
-        JFileChooser chooser = new JFileChooser(current);
-        if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-            control.setCurrentFile(chooser.getSelectedFile());
-            saveFile();
-        }
-    }
-
-    private void loadFile() {
-        JFileChooser chooser = new JFileChooser();
-        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            try {
-                control.loadFile(chooser.getSelectedFile());
-            } catch (Exception ex) {
-                message.setText("Lataus epäonnistui");
-                message.setForeground(Color.red);
-                repaint();
-            }
-        }
-    }
-
-    public void setMessage(String newMessage, boolean isWarning) {
-        message.setText(newMessage);
-        if (isWarning) {
-            message.setForeground(Color.red);
-        } else {
-            message.setForeground(Color.black);
-        }
-    }
-
-    private void newCard() {
-        new NewCardDialog(this, fieldNames, control);
-    }
-
-    private void search() {
-        new CardSearchDialog(this, fieldNames, control);
-    }
-
-    private void showManual() {
-        new Manual(this);
-    }
-
-    private void editCard() {
-        new CardEditDialog(this, fieldNames, control, tableModel, table.getSelectedRow());
-    }
-
-    private void viewCard() {
-        new CardView(this, fieldNames, control, tableModel, table.getSelectedRow());
-    }
-
+    /**
+     * Asks
+     * <code>control</code> to delete cards.
+     */
     private void deleteCard() {
         // Asks for confirmation first
         String message = "Haluatko todella tuhota valitut kortit?";
@@ -329,12 +250,152 @@ public class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * Opens up a dialog for editing card.
+     */
+    private void editCard() {
+        String[] fieldData = new String[fieldNames.length];
+        for (int i = 0; i < fieldNames.length; i++) {
+            fieldData[i] = (String) tableModel.getValueAt(table.getSelectedRow(), i);
+        }
+        new CardEditDialog(this, fieldNames, fieldData, control);
+    }
+
+    /**
+     * Asks user to choose file to be loaded and then
+     * <code>control</code> to load it.
+     */
+    private void loadFile() {
+        JFileChooser chooser = new JFileChooser();
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            try {
+                control.loadFile(chooser.getSelectedFile());
+            } catch (Exception ex) {
+                message.setText("Lataus epäonnistui");
+                message.setForeground(Color.red);
+                repaint();
+            }
+        }
+    }
+
+    /**
+     * Opens up a card adding window.
+     */
+    private void newCard() {
+        new NewCardDialog(this, fieldNames, control);
+    }
+
+    /**
+     * Asks user the name by which the file should be saved and then the
+     * <code>control</code> to save it.
+     */
+    private void saveAs() {
+        File current = control.getCurrentFile();
+        JFileChooser chooser = new JFileChooser(current);
+        if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            control.setCurrentFile(chooser.getSelectedFile());
+            saveFile();
+        }
+    }
+
+    /**
+     * Asks
+     * <code>control</code> to save the file.
+     */
+    private void saveFile() {
+        if (control.getCurrentFile() == null) {
+            saveAs();
+        } else {
+            try {
+                control.save();
+                message.setText("Tallennus onnistui");
+                message.setForeground(Color.black);
+            } catch (IOException ex) {
+                message.setText("Tallennus epäonnistui");
+                message.setForeground(Color.red);
+            }
+        }
+    }
+
+    /**
+     * Asks user if he wants to save the file before losing all the changes made
+     * to it. This is called when the file hasn't been saved after a change made
+     * to it.
+     *
+     * @return Yes, Cancel or No as corresponding JOptionPane integer
+     */
+    private int saveFirstDialog() {
+        Object[] options = {"Kyllä", "Ei", "peruuta"};
+        int saveFirst = JOptionPane.showOptionDialog(this, "Kortisto on muuttunut, tallenna ensin?", ""
+                + "Tallenna tiedosto?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,
+                null, options, options[0]);
+        return saveFirst;
+    }
+
+    /**
+     * Opens up a card search dialog.
+     */
+    private void search() {
+        new CardSearchDialog(this, fieldNames, control);
+    }
+
+    /**
+     * Changed the data of cards displayed to the user. This can be used when
+     * the register changes or when the user searches the register.
+     *
+     * @param newData The data of the cards to be displayed to the user.
+     */
     public void setCardTableData(Object[][] newData) {
         tableModel.setDataVector(newData, fieldNames);
     }
 
+    /**
+     * Sets the message shown to the user. Used by system to tell the user that
+     * operation has succeeded or failed etc. Warning texts are displayed on red
+     * and ordinary on black text.
+     *
+     * @param newMessage The content of the message to be displayed.
+     * @param isWarning True if the text is meant to be warning, false
+     * otherwise.
+     */
+    public void setMessage(String newMessage, boolean isWarning) {
+        message.setText(newMessage);
+        if (isWarning) {
+            message.setForeground(Color.red);
+        } else {
+            message.setForeground(Color.black);
+        }
+    }
+
+    /**
+     * Opens up the Help-window.
+     */
+    private void showManual() {
+        new Manual(this);
+    }
+
+    /**
+     * Opens up a card display window.
+     */
+    private void viewCard() {
+        String[] fieldData = new String[fieldNames.length];
+        for (int i = 0; i < fieldNames.length; i++) {
+            fieldData[i] = (String) tableModel.getValueAt(table.getSelectedRow(), i);
+        }
+        new CardView(this, fieldNames, fieldData, control);
+    }
+
+    /**
+     * A listener for loading a new file.
+     */
     private class LoadFileListener implements ActionListener {
 
+        /**
+         * After action being performed, the user will be asked if he wants to
+         * save the changes (when needed), and then what file he wishes to load.
+         *
+         * @param e The event launching this process.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             if (!control.needsToBeSaved()) {
@@ -360,8 +421,18 @@ public class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * A listener for opening a new file.
+     */
     private class NewFileListener implements ActionListener {
 
+        /**
+         * After action being performed, the user will be asked if he wants to
+         * save the changes (when needed). After that the
+         * <code>reset</code> method of the control is called.
+         *
+         * @param e The event launching this process.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
 
@@ -380,24 +451,51 @@ public class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * A listener for saving a new file.
+     */
     private class SaveFileListener implements ActionListener {
 
+        /**
+         * Calls the method
+         * <code>save()</code>.
+         *
+         * @param e The event launching this process.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             saveFile();
         }
     }
 
+    /**
+     * A listener for saving file by a name.
+     */
     private class SaveAsListener implements ActionListener {
 
+        /**
+         * Calls the method
+         * <code>SaveAs()</code>.
+         *
+         * @param e The event launching this process.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             saveAs();
         }
     }
 
+    /**
+     * A listener for quitting the program via the menu.
+     */
     private class QuitListener implements ActionListener {
 
+        /**
+         * If the file needs to be saved this asks first whether the user wants
+         * to do so. Otherwise closes immediately.
+         *
+         * @param e
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             if (!control.needsToBeSaved()) {
@@ -414,8 +512,18 @@ public class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * A listener for closing the window from the cross in the upper bar. This
+     * needs to exist to prevent user accidentally losing data.
+     */
     private class CloseListener extends WindowAdapter {
 
+        /**
+         * If the file needs to be saved this asks first whether the user wants
+         * to do so. Otherwise closes immediately.
+         *
+         * @param winEvt The event launching this process.
+         */
         @Override
         public void windowClosing(WindowEvent winEvt) {
             if (!control.needsToBeSaved()) {
@@ -433,32 +541,68 @@ public class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * A listener for new card to be added.
+     */
     private class NewCardListener implements ActionListener {
 
+        /**
+         * Calls the method
+         * <code>newCard()</code>.
+         *
+         * @param e The event launching this process.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             newCard();
         }
     }
 
+    /**
+     * A listener for the detailed search.
+     */
     private class SearchListener implements ActionListener {
 
+        /**
+         * calls the method
+         * <code>search()</code>.
+         *
+         * @param e The event launching this process.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             search();
         }
     }
 
+    /**
+     * A listener for the view all button.
+     */
     private class ViewallListener implements ActionListener {
 
+        /**
+         * calls the method
+         * <code>viewAll()</code>.
+         *
+         * @param e The event launching this process.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             control.viewAll();
         }
     }
 
+    /**
+     * A listener for a card view window to pop up.
+     */
     private class CardViewListener implements ActionListener {
 
+        /**
+         * If one and only one card in the table is selected, this calls the
+         * <code>viewCard()</code> method.
+         *
+         * @param e The event launching this process.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             if (table.getSelectedRowCount() == 1) {
@@ -467,8 +611,17 @@ public class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * A listener for the card edit window to pop up.
+     */
     private class CardEditListener implements ActionListener {
 
+        /**
+         * If one and only one card is selected, this calls
+         * <code>editCard()</code> method.
+         *
+         * @param e The event launching this process.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             if (table.getSelectedRowCount() == 1) {
@@ -477,8 +630,17 @@ public class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * A listener for deleting cards.
+     */
     private class CardDeleteListener implements ActionListener {
 
+        /**
+         * Calls
+         * <code>deleteCard()</code> method.
+         *
+         * @param e The event launching this process.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             if (table.getSelectedRowCount() > 0) {
@@ -487,16 +649,33 @@ public class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * A listener for popping up the manual window.
+     */
     private class HelpMenuitemListener implements ActionListener {
 
+        /**
+         * Calls
+         * <code>showManual()</code> method.
+         *
+         * @param e The event launching this process.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             showManual();
         }
     }
 
+    /**
+     * A listener for the card table.
+     */
     private class TableEventListener implements MouseListener {
 
+        /**
+         * When a card is double clicked, a card view window will pop up.
+         *
+         * @param e The event launching this process.
+         */
         @Override
         public void mouseClicked(MouseEvent e) {
             if (e.getClickCount() == 2) {
@@ -504,6 +683,11 @@ public class MainWindow extends JFrame {
             }
         }
 
+        /**
+         * When a card is right clicked, a context menu will pop up.
+         *
+         * @param e The event launching this process.
+         */
         @Override
         public void mousePressed(MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON3) {
@@ -525,8 +709,17 @@ public class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * A listener for the mouse being hovered over the card table.
+     */
     private class TableHoverListener extends MouseMotionAdapter {
 
+        /**
+         * If the mouse is hovered over the table, this will show a tooltipbox
+         * with the information of the card pointed at.
+         *
+         * @param e The event launching this process.
+         */
         @Override
         public void mouseMoved(MouseEvent e) {
 
@@ -542,6 +735,9 @@ public class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * The context menu shown to the user when he right clicks the card table.
+     */
     private class ContextMenu extends JPopupMenu {
 
         public ContextMenu(MouseEvent e) {
@@ -567,14 +763,28 @@ public class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * A listener for the quick search button.
+     */
     private class QuickSearchListener implements ActionListener {
 
         private JTextField searchField;
 
+        /**
+         * The constructor needs to know where it is reading the search word
+         * from when the button is clicked.
+         *
+         * @param searchField The field from which the search word is read from.
+         */
         public QuickSearchListener(JTextField searchField) {
             this.searchField = searchField;
         }
 
+        /**
+         * Asks the control to do quick search.
+         *
+         * @param e The event launching this process.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             control.searchAnyField(searchField.getText());

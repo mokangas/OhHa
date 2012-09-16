@@ -1,31 +1,43 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package Control;
 
-import Control.ExceptionsThrownByRegister.AlmostSameCardExistsException;
 import UserInterfaces.GUI.MainWindow;
-import cardregister.Card;
+import cardregister.CardRegister;
+import cardregister.CardRegisterExceptions.AlmostSameCardExistsException;
+import cardregister.CardRegisterExceptions.CardAlreadyExistsException;
+import cardregister.CardRegisterExceptions.NullInputException;
 import cardregister.Register;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
- * @author IstuvaHarka
+ * A mediator class between <code>CardRegister</code> and the UI. This class
+ * also takes care of the running of the program, i.e. this contains the main-
+ * method and the when the constructor of this class is called, the program will
+ * start to run.
+ * 
+ * @author mokangas
  */
 public class Control {
 
+   /**
+    * The main-method. Constructs a new <code>Control</code>-object, which launches
+    * the program.
+    * 
+    * @param args Vommand line arguments, nothing is done with them.
+    */ 
     public static void main(String[] args) {
         Control control = new Control();
     }
-    private Register register;
-    private MainWindow mainWindow;
+    
+    private CardRegister register; // The register this object is attached to
+    private MainWindow mainWindow; // The main window of the program's GUI.
 
+    /**
+     * 
+     */
     public Control() {
         register = new Register();
         String[] fieldNames = register.getFieldNames();
@@ -55,7 +67,8 @@ public class Control {
         mainWindow.setTitle("Kortisto: " + register.getCurrentFile().getName());
     }
 
-    public void addNewCard(String[] content) throws Exception {
+    public void addNewCard(String[] content) throws NullInputException, 
+            AlmostSameCardExistsException, CardAlreadyExistsException {
         register.createCard(content);
         mainWindow.setCardTableData(register.getCardData());
         mainWindow.setMessage("Kortti lisätty", false);
@@ -83,7 +96,8 @@ public class Control {
     }
 
     public void editCard(String[] oldData, String[] newData)
-            throws AlmostSameCardExistsException {
+            throws AlmostSameCardExistsException, NullInputException,
+            CardAlreadyExistsException{
         register.editCard(oldData, newData);
         mainWindow.setCardTableData(register.getCardData());
         mainWindow.setMessage("Kortin tiedot muutettu", false);
@@ -100,7 +114,7 @@ public class Control {
     }
 
     public int getNameFieldsNumber() {
-        return Card.TITLE;
+        return register.getNameField();
     }
 
     public void searchAnyField(String searchWord) {
